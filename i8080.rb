@@ -9,10 +9,14 @@ class I8080
     @a = 0; @f = 0; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
   end
 
-  def run
+  def run cycle=-1
     loop do
+
       fetch
       dump_regs
+
+      cycle -= 1 if cycle > 0
+      break if cycle == 0
     end
   end
 
