@@ -20,14 +20,14 @@ class I8080
     end
   end
 
+  def bc; b << 8 | c; end
+  def de; d << 8 | e; end
+  def hl; h << 8 | l; end
+
   private
 
   def fetch
   end
-
-  def bc; b << 8 | c; end
-  def de; d << 8 | e; end
-  def hl; h << 8 | l; end
 
   def dump_regs
     now = Time.now
