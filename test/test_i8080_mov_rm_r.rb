@@ -7,7 +7,7 @@ class TestI8080 < Test::Unit::TestCase
     @cpu = I8080.new
   end
 
-  sub_test_case "MOV   rm r" do
+  sub_test_case "MOV   r r" do
 
     setup do
       @cpu.a = 0x11

@@ -33,6 +33,8 @@ class I8080
   def fetch
 
     case @mem[@pc]
+    when 0b01_110_110
+      hlt
     when lambda{|v| (v & 0b01_000_000) == 0b01_000_000}
       mov_r_r
     end
@@ -54,6 +56,10 @@ class I8080
     else
       @clock += model_af? ? 5 : 4
     end
+  end
+
+  def hlt
+    @clock += 7
   end
 
   def read_r r
