@@ -23,6 +23,7 @@ class I8080
     end
   end
 
+  def psw; @a << 8 | @f; end
   def bc; @b << 8 | @c; end
   def de; @d << 8 | @e; end
   def hl; @h << 8 | @l; end
@@ -32,8 +33,8 @@ class I8080
   def fetch
 
     case @mem[@pc]
-    when lambda{|v| (v & 0b01000000) == 0b01000000}
-      mov_rm_r
+    when lambda{|v| (v & 0b01_000_000) == 0b01_000_000}
+      mov_r_r
     end
 
   end
@@ -42,13 +43,13 @@ class I8080
     @model == "uPD8080AF"
   end
 
-  def mov_rm_r
+  def mov_r_r
     v = @mem[pc]
-    rm = (v & 0b00111000) >> 3
-    r = v & 0b111
-    write_rm rm, read_r(r)
+    d = (v & 0b00_111_000) >> 3
+    s = v & 0b00_000_111
+    write_r d, read_r(s)
     @pc += 1
-    if (rm == 6) || (r == 6)
+    if (d == 6) || (s == 6)
       @clock += 7
     else
       @clock += model_af? ? 5 : 4
@@ -56,16 +57,6 @@ class I8080
   end
 
   def read_r r
-    throw "M is not permitted." if r == 6
-    read_rm r
-  end
-
-  def write_r r, v
-    throw "M is not permitted." if r == 6
-    write_rm r, v
-  end
-
-  def read_rm r
     case r
     when 7
       @a
@@ -86,7 +77,7 @@ class I8080
     end
   end
 
-  def write_rm r, v
+  def write_r r, v
     case r
     when 7
       @a = v
@@ -103,7 +94,6 @@ class I8080
     when 5
       @l = v
     when 6
-p @mem, hl, v
       @mem[hl] = v
     end
   end

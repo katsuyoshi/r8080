@@ -76,11 +76,20 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 4, @cpu.clock
     end
 
+    test "MOV A, M" do
+      @cpu.h = 0; @cpu.l = 0
+      @cpu.mem[0] = 0b01111110
+      @cpu.run 1
+      assert_equal 0b01111110, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
 
     test "MOV B, A" do
       @cpu.mem[0] = 0b01000111
       @cpu.run 1
-      assert_equal 0x11, @cpu.a
+      assert_equal 0x11, @cpu.b
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -88,7 +97,7 @@ class TestI8080 < Test::Unit::TestCase
     test "MOV C, A" do
       @cpu.mem[0] = 0b01001111
       @cpu.run 1
-      assert_equal 0x11, @cpu.a
+      assert_equal 0x11, @cpu.c
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -96,7 +105,7 @@ class TestI8080 < Test::Unit::TestCase
     test "MOV D, A" do
       @cpu.mem[0] = 0b01010111
       @cpu.run 1
-      assert_equal 0x11, @cpu.a
+      assert_equal 0x11, @cpu.d
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -104,7 +113,7 @@ class TestI8080 < Test::Unit::TestCase
     test "MOV E, A" do
       @cpu.mem[0] = 0b01011111
       @cpu.run 1
-      assert_equal 0x11, @cpu.a
+      assert_equal 0x11, @cpu.e
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -112,7 +121,7 @@ class TestI8080 < Test::Unit::TestCase
     test "MOV H, A" do
       @cpu.mem[0] = 0b01100111
       @cpu.run 1
-      assert_equal 0x11, @cpu.a
+      assert_equal 0x11, @cpu.h
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -120,9 +129,18 @@ class TestI8080 < Test::Unit::TestCase
     test "MOV L, A" do
       @cpu.mem[0] = 0b01101111
       @cpu.run 1
-      assert_equal 0x11, @cpu.a
+      assert_equal 0x11, @cpu.l
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
+    end
+
+    test "MOV M, A" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0] = 0b01110111
+      @cpu.run 1
+      assert_equal 0x11, @cpu.mem[0x8000]
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
     end
 
 
