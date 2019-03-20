@@ -146,4 +146,27 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "MVI   r imm" do
+
+    test "MVI A, 0x12" do
+      @cpu.mem[0] = 0b00_111_110
+      @cpu.mem[1] = 0x12
+      @cpu.run 1
+      assert_equal 0x12, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "MVI M, 0x12" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0] = 0b00_110_110
+      @cpu.mem[1] = 0x12
+      @cpu.run 1
+      assert_equal 0x12, @cpu.mem[0x8000]
+      assert_equal 2, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
 end

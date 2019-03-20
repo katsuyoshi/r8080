@@ -30,6 +30,15 @@ class I8080
 
   private
 
+  def model_af?
+    @model == "uPD8080AF"
+  end
+
+  def reg_m? v
+    v == 6
+  end
+
+
   def fetch
 
     case @mem[@pc]
@@ -37,21 +46,30 @@ class I8080
       hlt
     when lambda{|v| (v & 0b01_000_000) == 0b01_000_000}
       mov_r_r
+    when lambda{|v| (v & 0b00_000_110) == 0b00_000_110}
+      mvi_r_i
     end
 
   end
 
-  def model_af?
-    @model == "uPD8080AF"
+  def mvi_r_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    d = (v & 0b00_111_000) >> 3
+    write_r d, i
+    if reg_m? d
+      @clock += 10
+    else
+      @clock += 7
+    end
   end
 
   def mov_r_r
-    v = @mem[pc]
+    v = @mem[@pc]; @pc += 1
     d = (v & 0b00_111_000) >> 3
     s = v & 0b00_000_111
     write_r d, read_r(s)
-    @pc += 1
-    if (d == 6) || (s == 6)
+    if reg_m?(d) || reg_m?(s)
       @clock += 7
     else
       @clock += model_af? ? 5 : 4
