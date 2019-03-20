@@ -7,6 +7,32 @@ class TestI8080 < Test::Unit::TestCase
     @cpu = I8080.new
   end
 
+  sub_test_case "ADD   r" do
+
+    setup do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.a = 0x12
+      @cpu.mem[0x8000] = 0x23
+    end
+
+    test "ADD A" do
+      @cpu.mem[0] = 0b10_000_111
+      @cpu.run 1
+      assert_equal 0x24, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ADD M" do
+      @cpu.mem[0] = 0b10_000_110
+      @cpu.run 1
+      assert_equal 0x35, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
   sub_test_case "DCR   r" do
 
     setup do

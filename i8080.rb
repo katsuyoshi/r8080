@@ -5,6 +5,15 @@ class I8080
   attr_accessor :clock
   attr_reader :mem, :model
 
+  REG_A = 7
+  REG_B = 0
+  REG_C = 1
+  REG_D = 2
+  REG_E = 3
+  REG_H = 4
+  REG_L = 5
+  REG_M = 6
+
   def initialize options={}
     @model = options[:model] || "uPD8080A" # or uPD8080AF
     @mem = [0] * 64 * 1024
@@ -50,7 +59,15 @@ class I8080
   end
 
   def reg_m? v
-    v == 6
+    v == REG_M
+  end
+
+  def src_r v
+    (v & 0b00_000_111)
+  end
+
+  def dst_r v
+    (v & 0b00_111_000) >> 3
   end
 
 
@@ -69,6 +86,8 @@ class I8080
       inr_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_101}
       dcr_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_000_000}
+      add_r
     end
 
   end
@@ -76,9 +95,20 @@ class I8080
 
   # --- execute command
 
+  def add_r
+    v = @mem[@pc]; @pc += 1
+    s = src_r v
+    write_r REG_A, read_r(REG_A) + read_r(s)
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+
   def dcr_r
     v = @mem[@pc]; @pc += 1
-    d = (v & 0b00_111_000) >> 3
+    d = dst_r v
     write_r d, read_r(d) - 1
     if reg_m? d
       @clock += 10
@@ -89,7 +119,7 @@ class I8080
 
   def inr_r
     v = @mem[@pc]; @pc += 1
-    d = (v & 0b00_111_000) >> 3
+    d = dst_r v
     write_r d, read_r(d) + 1
     if reg_m? d
       @clock += 10
@@ -101,7 +131,7 @@ class I8080
   def mvi_r_i
     v = @mem[@pc]; @pc += 1
     i = @mem[@pc]; @pc += 1
-    d = (v & 0b00_111_000) >> 3
+    d = dst_r v
     write_r d, i
     if reg_m? d
       @clock += 10
@@ -112,8 +142,8 @@ class I8080
 
   def mov_r_r
     v = @mem[@pc]; @pc += 1
-    d = (v & 0b00_111_000) >> 3
-    s = v & 0b00_000_111
+    d = dst_r v
+    s = src_r v
     write_r d, read_r(s)
     if reg_m?(d) || reg_m?(s)
       @clock += 7
@@ -131,21 +161,21 @@ class I8080
 
   def read_r r
     case r
-    when 7
+    when REG_A
       @a
-    when 0
+    when REG_B
       @b
-    when 1
+    when REG_C
       @c
-    when 2
+    when REG_D
       @d
-    when 3
+    when REG_E
       @e
-    when 4
+    when REG_H
       @h
-    when 5
+    when REG_L
       @l
-    when 6
+    when REG_M
       @mem[hl]
     end
   end
@@ -153,21 +183,21 @@ class I8080
   def write_r r, v
     v &= 0xff
     case r
-    when 7
+    when REG_A
       @a = v
-    when 0
+    when REG_B
       @b = v
-    when 1
+    when REG_C
       @c = v
-    when 2
+    when REG_D
       @d = v
-    when 3
+    when REG_E
       @e = v
-    when 4
+    when REG_H
       @h = v
-    when 5
+    when REG_L
       @l = v
-    when 6
+    when REG_M
       @mem[hl] = v
     end
   end
