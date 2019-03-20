@@ -15,7 +15,7 @@ class I8080
   def run cycle=-1
     loop do
 
-      fetch
+      execute
       #dump_regs
 
       cycle -= 1 if cycle > 0
@@ -28,6 +28,21 @@ class I8080
   def de; @d << 8 | @e; end
   def hl; @h << 8 | @l; end
 
+  # --- dump register
+
+  def dump_regs
+    puts
+    print "\n\e[2A"
+    %w(A F B C D E H L).zip([a, f, b, c, d, e, h, l]).each do |n, v|
+      print "#{n}:#{v.to_s(16).rjust(2, '0')} "
+    end
+    print "\n"
+    %w(BC DE HL PC SP).zip([bc, de, hl, pc, sp]).each do |n, v|
+      print "#{n}:#{v.to_s(16).rjust(4, '0')} "
+    end
+  end
+
+
   private
 
   def model_af?
@@ -39,19 +54,37 @@ class I8080
   end
 
 
-  def fetch
+  # --- execute
+
+  def execute
 
     case @mem[@pc]
     when 0b01_110_110
       hlt
-    when lambda{|v| (v & 0b01_000_000) == 0b01_000_000}
+    when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
-    when lambda{|v| (v & 0b00_000_110) == 0b00_000_110}
+    when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
       mvi_r_i
-    when lambda{|v| (v & 0b00_000_100) == 0b00_000_100}
+    when lambda{|v| (v & 0b11_000_111) == 0b00_000_100}
       inr_r
+    when lambda{|v| (v & 0b11_000_111) == 0b00_000_101}
+      dcr_r
     end
 
+  end
+
+
+  # --- execute command
+
+  def dcr_r
+    v = @mem[@pc]; @pc += 1
+    d = (v & 0b00_111_000) >> 3
+    write_r d, read_r(d) - 1
+    if reg_m? d
+      @clock += 10
+    else
+      @clock += 5
+    end
   end
 
   def inr_r
@@ -93,6 +126,9 @@ class I8080
     @clock += 7
   end
 
+
+  # --- read / write register
+
   def read_r r
     case r
     when 7
@@ -115,6 +151,7 @@ class I8080
   end
 
   def write_r r, v
+    v &= 0xff
     case r
     when 7
       @a = v
@@ -133,22 +170,6 @@ class I8080
     when 6
       @mem[hl] = v
     end
-  end
-
-  def dump_regs
-    now = Time.now
-    if @dump_regs_at.nil? || (now - @dump_regs_at >= 1)
-      puts if @dump_regs_at.nil?
-      print "\n\e[2A"
-      %w(A F B C D E H L).zip([a, f, b, c, d, e, h, l]).each do |n, v|
-        print "#{n}:#{v.to_s(16).rjust(2, '0')} "
-      end
-      print "\n"
-      %w(BC DE HL PC SP).zip([bc, de, hl, pc, sp]).each do |n, v|
-        print "#{n}:#{v.to_s(16).rjust(4, '0')} "
-      end
-    end
-    @dump_regs_at = now
   end
 
 end
