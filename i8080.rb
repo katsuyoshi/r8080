@@ -48,8 +48,21 @@ class I8080
       mov_r_r
     when lambda{|v| (v & 0b00_000_110) == 0b00_000_110}
       mvi_r_i
+    when lambda{|v| (v & 0b00_000_100) == 0b00_000_100}
+      inr_r
     end
 
+  end
+
+  def inr_r
+    v = @mem[@pc]; @pc += 1
+    d = (v & 0b00_111_000) >> 3
+    write_r d, read_r(d) + 1
+    if reg_m? d
+      @clock += 10
+    else
+      @clock += 5
+    end
   end
 
   def mvi_r_i
