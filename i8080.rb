@@ -14,10 +14,16 @@ class I8080
   REG_L = 5
   REG_M = 6
 
+  FLG_S  = 0x80
+  FLG_Z  = 0x40
+  FLG_H = 0x10
+  FLG_P  = 0x04
+  FLG_C = 0x01
+
+
   def initialize options={}
-    @model = options[:model] || "uPD8080A" # or uPD8080AF
     @mem = [0] * 64 * 1024
-    @a = 0; @f = 0; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
+    @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
     @clock = 0
   end
 
@@ -51,12 +57,68 @@ class I8080
     end
   end
 
+  def flg_s?
+    (@f & FLG_S) != 0
+  end
+
+  def flg_s= f
+    if f
+      @f |= FLG_S
+    else
+      @f &= ~FLG_S
+    end
+  end
+
+  def flg_z?
+    (@f & FLG_Z) != 0
+  end
+
+  def flg_z= f
+    if f
+      @f |= FLG_Z
+    else
+      @f &= ~FLG_Z
+    end
+  end
+
+  def flg_h?
+    (@f & FLG_H) != 0
+  end
+
+  def flg_h= f
+    if f
+      @f |= FLG_H
+    else
+      @f &= ~FLG_H
+    end
+  end
+
+  def flg_p?
+    (@f & FLG_P) != 0
+  end
+
+  def flg_p= f
+    if f
+      @f |= FLG_P
+    else
+      @f &= ~FLG_P
+    end
+  end
+
+  def flg_c?
+    (@f & FLG_C) != 0
+  end
+
+  def flg_c= f
+    if f
+      @f |= FLG_C
+    else
+      @f &= ~FLG_C
+    end
+  end
+
 
   private
-
-  def model_af?
-    @model == "uPD8080AF"
-  end
 
   def reg_m? v
     v == REG_M
@@ -98,7 +160,7 @@ class I8080
   def add_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) + read_r(s)
+    write_r REG_A, read_r(REG_A) + read_r(s), true
     if reg_m? s
       @clock += 7
     else
@@ -109,7 +171,7 @@ class I8080
   def dcr_r
     v = @mem[@pc]; @pc += 1
     d = dst_r v
-    write_r d, read_r(d) - 1
+    write_r d, read_r(d) - 1, true
     if reg_m? d
       @clock += 10
     else
@@ -120,7 +182,7 @@ class I8080
   def inr_r
     v = @mem[@pc]; @pc += 1
     d = dst_r v
-    write_r d, read_r(d) + 1
+    write_r d, read_r(d) + 1, true
     if reg_m? d
       @clock += 10
     else
@@ -148,7 +210,7 @@ class I8080
     if reg_m?(d) || reg_m?(s)
       @clock += 7
     else
-      @clock += model_af? ? 5 : 4
+      @clock += 4
     end
   end
 
@@ -180,25 +242,35 @@ class I8080
     end
   end
 
-  def write_r r, v
-    v &= 0xff
+  def write_r r, v, set_f = false
+    v8 = v & 0xff
     case r
     when REG_A
-      @a = v
+      if set_f
+        vrh = read_r(r) >> 4
+        v8h = v8 >> 4
+        self.flg_s = (v8 & FLG_S) == FLG_S
+        self.flg_z = (v8 == 0)
+        self.flg_h = vrh != v8h
+        # odd parity
+        self.flg_p = ((8.times.inject(0){|n,i| n + ((v >> i) & 0x01)}) & 0x01) == 0
+        self.flg_c = (v & 0xff00) != 0
+      end
+      @a = v8
     when REG_B
-      @b = v
+      @b = v8
     when REG_C
-      @c = v
+      @c = v8
     when REG_D
-      @d = v
+      @d = v8
     when REG_E
-      @e = v
+      @e = v8
     when REG_H
-      @h = v
+      @h = v8
     when REG_L
-      @l = v
+      @l = v8
     when REG_M
-      @mem[hl] = v
+      @mem[hl] = v8
     end
   end
 
