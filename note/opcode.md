@@ -1,0 +1,85 @@
+
+## Progress of implementation.
+
+Reffer:
+http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
+
+- [x] 01 ddd sss  MOV   rm, r     5/7   4/7  move
+- [x] 01 ddd 110  MOV   r, M       7     7   move memory to register
+- [x] 01 110 110  HLT              7     7   halt
+- [x] 00 ddd 110  MVI   rm, imm   7/10  7/10 move immediate
+- [x] 00 ddd 100  INR   rm        5/10  5/10 increment
+- [x] 00 ddd 101  DCR   rm        5/10  5/10 decrement
+- [x] 10 000 sss  ADD   rm        4/7   4/7  add
+- [ ] 10 001 sss  ADC   rm        4/7   4/7  add with carry
+- [ ] 10 010 sss  SUB   rm        4/7   4/7  subtract
+- [ ] 10 011 sss  SBB   rm        4/7   4/7  subtract with borrow
+- [ ] 10 100 sss  ANA   rm        4/7   4/7  and with A
+- [ ] 10 101 sss  XRA   rm        4/7   4/7  exclusive or with A
+- [ ] 10 110 sss  ORA   rm        4/7   4/7  or with A
+- [ ] 10 111 sss  CMP   rm        4/7   4/7  compare with A
+- [ ] 11 000 110  ADI   imm        7     7   add immediate to A
+- [ ] 11 001 110  ACI   imm        7     7   add immediate to A with carry
+- [ ] 11 010 110  SUI   imm        7     7   subtract immediate from A
+- [ ] 11 011 110  SBI   imm        7     7   subtract immediate from A with borrow
+- [ ] 11 100 110  ANI   imm        7     7   and immediate with A
+- [ ] 11 101 110  XRI   imm        7     7   exclusive or immediate with A
+- [ ] 11 110 110  ORI   imm        7     7   or immedeate with A
+- [ ] 11 111 110  CPI   imm        7     7   compare immediate with A
+- [ ] 00 000 111  RLC              4     4   rotate A left
+- [ ] 00 001 111  RRC              4     4   rotate A right
+- [ ] 00 010 111  RAL              4     4   rotate A left through carry
+- [ ] 00 011 111  RAR              4     4   rotate A right through carry
+- [ ] 11 000 011  JMP   addr      10    10   jump unconditional
+- [ ] 11 011 010  JC    addr      10    10   jump on carry
+- [ ] 11 010 010  JNC   addr      10    10   jump on no carry
+- [ ] 11 001 010  JZ    addr      10    10   jump on zero
+- [ ] 11 000 010  JNZ   addr      10    10   jump on no zero
+- [ ] 11 110 010  JP    addr      10    10   jump on positive
+- [ ] 11 111 010  JM    addr      10    10   jump on minus
+- [ ] 11 101 010  JPE   addr      10    10   jump on parity even
+- [ ] 11 100 010  JPO   addr      10    10   jump on parity odd
+- [ ] 11 001 101  CALL  addr      17    17   call unconditional
+- [ ] 11 011 100  CC    addr     11/17 11/17 call on carry
+- [ ] 11 010 100  CNC   addr     11/17 11/17 call on no carry
+- [ ] 11 001 100  CZ    addr     11/17 11/17 call on zero
+- [ ] 11 000 100  CNZ   addr     11/17 11/17 call on no zero
+- [ ] 11 110 100  CP    addr     11/17 11/17 call on positive
+- [ ] 11 111 100  CM    addr     11/17 11/17 call on minus
+- [ ] 11 101 100  CPE   addr     11/17 11/17 call on parity even
+- [ ] 11 100 100  CPO   addr     11/17 11/17 call on parity odd
+- [ ] 11 001 001  RET             10    11   return
+- [ ] 11 011 000  RC              5/11  5/11 return on carry
+- [ ] 11 010 000  RNC             5/11  5/11 return on no carry
+- [ ] 11 001 000  RZ              5/11  5/11 return on zero
+- [ ] 11 000 000  RNZ             5/11  5/11 return on no zero
+- [ ] 11 110 000  RP              5/11  5/11 return on positive
+- [ ] 11 111 000  RM              5/11  5/11 return on minus
+- [ ] 11 101 000  RPE             5/11  5/11 return on parity even
+- [ ] 11 100 000  RPO             5/11  5/11 return on parity odd
+- [ ] 11 vvv 111  RST   vec       11    11   restart
+- [ ] 11 011 011  IN    port      10    10   input
+- [ ] 11 010 011  OUT   port      10    10   output
+- [ ] 00 pp0 001  LXI   rp, imm16 10    10   load imediate register pair
+- [ ] 11 pp0 101  PUSH  rr        11    11   push register pair on stack
+- [ ] 11 pp0 001  POP   rr        10    10   pop register pair off stack
+- [ ] 00 110 010  STA   addr      13    13   store A direct
+- [ ] 00 111 010  LDA   addr      13    13   load A direct
+- [ ] 11 101 011  XCHG             4     4   exchange D & E, H & L registers
+- [ ] 11 100 011  XTHL            18    17   exchange top of stack, H & L
+- [ ] 11 111 001  SPHL             5     4   H & L to stack pointer
+- [ ] 11 101 001  PCHL             5     5   H & L to program counter
+- [ ] 00 pp1 001  DAD   rp        10    11   add register pair to H & L
+- [ ] 00 pp0 010  STAX  rx         7     7   store A indirect
+- [ ] 00 pp1 010  LDAX  rx         7     7   load A indirect
+- [ ] 00 pp0 011  INX   rp         5     5   increment register pair
+- [ ] 00 pp1 011  DCX   rp         5     5   decrement register pair
+- [ ] 00 101 111  CMA              4     4   complement A
+- [ ] 00 110 111  STC              4     4   set carry
+- [ ] 00 111 111  CMC              4     4   complement carry
+- [ ] 00 100 111  DAA              4     4   decimal adjust A
+- [ ] 00 100 010  SHLD  addr      16    16   store H & L direct
+- [ ] 00 101 010  LHLD  addr      16    16   store H & L direct
+- [ ] 11 111 011  EI               4     4   enable interrupts
+- [ ] 11 110 011  DI               4     4   disable interrupt
+- [ ] 00 000 000  NOP              4     4   no operation
