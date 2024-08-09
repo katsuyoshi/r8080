@@ -247,4 +247,183 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+
+  sub_test_case "ADC   r" do
+
+    setup do
+      @cpu.a = 0x11
+      @cpu.b = 0x22
+      @cpu.c = 0x33
+      @cpu.d = 0x44
+      @cpu.e = 0x55
+      @cpu.h = 0x66
+      @cpu.l = 0x77
+    end
+
+    test "ADC A without Carry" do
+      @cpu.mem[0] = 0b10_001_111
+      @cpu.run 1
+      assert_equal 0x22, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ADC A with Carry" do
+      @cpu.mem[0] = 0b10_001_111
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x23, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ADC B without Carry" do
+      @cpu.mem[0] = 0b10_001_000
+      @cpu.run 1
+      assert_equal 0x33, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ADC B with Carry" do
+      @cpu.mem[0] = 0b10_001_000
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x34, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ADC M without Carry" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0x8000] = 0x88
+      @cpu.mem[0] = 0b10_001_110
+      @cpu.run 1
+      assert_equal 0x99, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "ADC M with Carry" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0x8000] = 0x88
+      @cpu.mem[0] = 0b10_001_110
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x9a, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "SUB   r" do
+
+    setup do
+      @cpu.a = 0x11
+      @cpu.b = 0x22
+      @cpu.c = 0x33
+      @cpu.d = 0x44
+      @cpu.e = 0x55
+      @cpu.h = 0x66
+      @cpu.l = 0x77
+    end
+
+    test "SUB A" do
+      @cpu.mem[0] = 0b10_010_111
+      @cpu.run 1
+      assert_equal 0x00, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "SUB B" do
+      @cpu.mem[0] = 0b10_010_000
+      @cpu.run 1
+      assert_equal 0xef, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "SUB M" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0x8000] = 0x88
+      @cpu.mem[0] = 0b10_010_110
+      @cpu.run 1
+      assert_equal 0x89, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "SBB   r" do
+
+    setup do
+      @cpu.a = 0x11
+      @cpu.b = 0x22
+      @cpu.c = 0x33
+      @cpu.d = 0x44
+      @cpu.e = 0x55
+      @cpu.h = 0x66
+      @cpu.l = 0x77
+    end
+
+    test "SBB A without Borrow" do
+      @cpu.mem[0] = 0b10_011_111
+      @cpu.run 1
+      assert_equal 0x00, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "SBB A with Borrow" do
+      @cpu.mem[0] = 0b10_011_111
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0xff, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "SBB B without Borrow" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.run 1
+      assert_equal 0xef, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "SBB B with Borrow" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0xee, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "SBB M without Borrow" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0x8000] = 0x88
+      @cpu.mem[0] = 0b10_011_110
+      @cpu.run 1
+      assert_equal 0x89, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "SBB M with Borrow" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0x8000] = 0x88
+      @cpu.mem[0] = 0b10_011_110
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x88, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
 end

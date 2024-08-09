@@ -11,9 +11,9 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 00 ddd 100  INR   rm        5/10  5/10 increment
 - [x] 00 ddd 101  DCR   rm        5/10  5/10 decrement
 - [x] 10 000 sss  ADD   rm        4/7   4/7  add
-- [ ] 10 001 sss  ADC   rm        4/7   4/7  add with carry
-- [ ] 10 010 sss  SUB   rm        4/7   4/7  subtract
-- [ ] 10 011 sss  SBB   rm        4/7   4/7  subtract with borrow
+- [x] 10 001 sss  ADC   rm        4/7   4/7  add with carry
+- [x] 10 010 sss  SUB   rm        4/7   4/7  subtract
+- [x] 10 011 sss  SBB   rm        4/7   4/7  subtract with borrow
 - [ ] 10 100 sss  ANA   rm        4/7   4/7  and with A
 - [ ] 10 101 sss  XRA   rm        4/7   4/7  exclusive or with A
 - [ ] 10 110 sss  ORA   rm        4/7   4/7  or with A

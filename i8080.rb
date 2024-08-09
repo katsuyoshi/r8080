@@ -150,6 +150,13 @@ class I8080
       dcr_r
     when lambda{|v| (v & 0b11_111_000) == 0b10_000_000}
       add_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_001_000}
+      adc_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_010_000}
+      sub_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_011_000}
+      sbb_r
+
     end
 
   end
@@ -161,6 +168,41 @@ class I8080
     v = @mem[@pc]; @pc += 1
     s = src_r v
     write_r REG_A, read_r(REG_A) + read_r(s), true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+
+  def adc_r
+    v = @mem[@pc]; @pc += 1
+    c = flg_c? ? 1 : 0
+    s = src_r v
+    write_r REG_A, read_r(REG_A) + read_r(s) + c, true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+
+  def sub_r
+    v = @mem[@pc]; @pc += 1
+    s = src_r v
+    write_r REG_A, read_r(REG_A) - read_r(s), true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+
+  def sbb_r
+    v = @mem[@pc]; @pc += 1
+    b = flg_c? ? 1 : 0
+    s = src_r v
+    write_r REG_A, read_r(REG_A) - read_r(s) - b, true
     if reg_m? s
       @clock += 7
     else
