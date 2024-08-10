@@ -426,4 +426,123 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "ANA   r" do
+
+    setup do
+      @cpu.a = 0xff
+      @cpu.b = 0x01
+      @cpu.c = 0x02
+      @cpu.d = 0x04
+      @cpu.e = 0x10
+      @cpu.h = 0x20
+      @cpu.l = 0x40
+      @cpu.mem[0x8000] = 0x80
+    end
+
+    test "ANA A" do
+      @cpu.mem[0] = 0b10_100_111
+      @cpu.run 1
+      assert_equal 0xff, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ANA B" do
+      @cpu.mem[0] = 0b10_100_000
+      @cpu.run 1
+      assert_equal 0x01, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ANA M" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0] = 0b10_100_110
+      @cpu.run 1
+      assert_equal 0x80, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "XRA   r" do
+
+    setup do
+      @cpu.a = 0x55
+      @cpu.b = 0xaa
+      @cpu.c = 0x02
+      @cpu.d = 0x04
+      @cpu.e = 0x10
+      @cpu.h = 0x20
+      @cpu.l = 0x40
+      @cpu.mem[0x8000] = 0xff
+    end
+
+    test "XRA A" do
+      @cpu.mem[0] = 0b10_101_111
+      @cpu.run 1
+      assert_equal 0x00, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "XRA B" do
+      @cpu.mem[0] = 0b10_101_000
+      @cpu.run 1
+      assert_equal 0xff, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "XRA M" do
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0] = 0b10_101_110
+      @cpu.run 1
+      assert_equal 0xaa, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    sub_test_case "ORA   r" do
+
+      setup do
+        @cpu.a = 0x00
+        @cpu.b = 0x01
+        @cpu.c = 0x02
+        @cpu.d = 0x04
+        @cpu.e = 0x10
+        @cpu.h = 0x20
+        @cpu.l = 0x40
+        @cpu.mem[0x8000] = 0x80
+      end
+  
+      test "ORA A" do
+        @cpu.mem[0] = 0b10_110_111
+        @cpu.run 1
+        assert_equal 0x00, @cpu.a
+        assert_equal 1, @cpu.pc
+        assert_equal 4, @cpu.clock
+      end
+  
+      test "ORA B" do
+        @cpu.mem[0] = 0b10_110_000
+        @cpu.run 1
+        assert_equal 0x01, @cpu.a
+        assert_equal 1, @cpu.pc
+        assert_equal 4, @cpu.clock
+      end
+  
+      test "ORA M" do
+        @cpu.h = 0x80; @cpu.l = 0
+        @cpu.mem[0] = 0b10_110_110
+        @cpu.run 1
+        assert_equal 0x80, @cpu.a
+        assert_equal 1, @cpu.pc
+        assert_equal 7, @cpu.clock
+      end
+
+    end
+  
+  end
 end

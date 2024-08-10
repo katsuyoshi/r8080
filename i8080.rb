@@ -156,6 +156,13 @@ class I8080
       sub_r
     when lambda{|v| (v & 0b11_111_000) == 0b10_011_000}
       sbb_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_100_000}
+      ana_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_101_000}
+      xra_r
+    when lambda{|v| (v & 0b11_111_000) == 0b10_110_000}
+      ora_r
+
 
     end
 
@@ -229,6 +236,39 @@ class I8080
       @clock += 10
     else
       @clock += 5
+    end
+  end
+
+  def ana_r
+    v = @mem[@pc]; @pc += 1
+    s = src_r v
+    write_r REG_A, read_r(REG_A) & read_r(s), true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+
+  def xra_r
+    v = @mem[@pc]; @pc += 1
+    s = src_r v
+    write_r REG_A, read_r(REG_A) ^ read_r(s), true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+
+  def ora_r
+    v = @mem[@pc]; @pc += 1
+    s = src_r v
+    write_r REG_A, read_r(REG_A) | read_r(s), true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
     end
   end
 
