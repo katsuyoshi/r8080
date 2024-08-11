@@ -140,6 +140,12 @@ class I8080
     case @mem[@pc]
     when 0b01_110_110
       hlt
+    when 0b11_000_110
+      adi_i
+    when 0b11_001_110
+      aci_i
+    when 0b11_010_110
+      sui_i
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
@@ -162,6 +168,8 @@ class I8080
       xra_r
     when lambda{|v| (v & 0b11_111_000) == 0b10_110_000}
       ora_r
+    when lambda{|v| (v & 0b11_111_000) == 0b11_011_000}
+      sbi_i
 
 
     end
@@ -194,6 +202,21 @@ class I8080
     end
   end
 
+  def adi_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    write_r REG_A, read_r(REG_A) + i, true
+    @clock += 7
+  end
+
+  def aci_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    c = flg_c? ? 1 : 0
+    write_r REG_A, read_r(REG_A) + i + c, true
+    @clock += 7
+  end
+
   def sub_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
@@ -215,6 +238,21 @@ class I8080
     else
       @clock += 4
     end
+  end
+
+  def sui_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    write_r REG_A, read_r(REG_A) - i, true
+    @clock += 7
+  end
+
+  def sbi_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    b = flg_c? ? 1 : 0
+    write_r REG_A, read_r(REG_A) - i - b, true
+    @clock += 7
   end
 
   def dcr_r

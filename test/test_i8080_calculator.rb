@@ -545,4 +545,93 @@ class TestI8080 < Test::Unit::TestCase
     end
   
   end
+
+  sub_test_case "ADI   i" do
+
+    setup do
+      @cpu.a = 0x11
+    end
+
+    test "ADI i" do
+      @cpu.mem[0] = 0b11_000_110
+      @cpu.mem[1] = 0x23
+      @cpu.run 1
+      assert_equal 0x34, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "ACI   i" do
+
+    setup do
+      @cpu.a = 0x11
+    end
+
+    test "ACI i without carry" do
+      @cpu.mem[0] = 0b11_001_110
+      @cpu.mem[1] = 0x23
+      @cpu.run 1
+      assert_equal 0x34, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "ACI i with carry" do
+      @cpu.mem[0] = 0b11_001_110
+      @cpu.mem[1] = 0x23
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x35, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "SUI   i" do
+
+    setup do
+      @cpu.a = 0x23
+    end
+
+    test "SUI i" do
+      @cpu.mem[0] = 0b11_010_110
+      @cpu.mem[1] = 0x11
+      @cpu.run 1
+      assert_equal 0x12, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "SBI   i" do
+
+    setup do
+      @cpu.a = 0x23
+    end
+
+    test "SBI i without borrow" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x11
+      @cpu.run 1
+      assert_equal 0x12, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "SBI i with borrow" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x11
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x11, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
 end
