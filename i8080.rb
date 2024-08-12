@@ -170,6 +170,13 @@ class I8080
       ora_r
     when lambda{|v| (v & 0b11_111_000) == 0b11_011_000}
       sbi_i
+    when lambda{|v| (v & 0b11_111_000) == 0b11_100_000}
+      ani_i
+    when lambda{|v| (v & 0b11_111_000) == 0b11_101_000}
+      xri_i
+    when lambda{|v| (v & 0b11_111_000) == 0b11_110_000}
+      ori_i
+
 
 
     end
@@ -288,6 +295,13 @@ class I8080
     end
   end
 
+  def ani_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    write_r REG_A, read_r(REG_A) & i, true
+    @clock += 7
+  end
+
   def xra_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
@@ -299,6 +313,13 @@ class I8080
     end
   end
 
+  def xri_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    write_r REG_A, read_r(REG_A) ^ i, true
+    @clock += 7
+  end
+
   def ora_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
@@ -308,6 +329,13 @@ class I8080
     else
       @clock += 4
     end
+  end
+
+  def ori_i
+    v = @mem[@pc]; @pc += 1
+    i = @mem[@pc]; @pc += 1
+    write_r REG_A, read_r(REG_A) | i, true
+    @clock += 7
   end
 
   def mvi_r_i

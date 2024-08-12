@@ -634,4 +634,55 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "ANI   i" do
+
+    setup do
+      @cpu.a = 0xff
+    end
+
+    test "ANI i" do
+      @cpu.mem[0] = 0b11_100_110
+      @cpu.mem[1] = 0x11
+      @cpu.run 1
+      assert_equal 0x11, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "XRI   i" do
+
+    setup do
+      @cpu.a = 0x5a
+    end
+
+    test "XRI i" do
+      @cpu.mem[0] = 0b11_101_110
+      @cpu.mem[1] = 0xaa
+      @cpu.run 1
+      assert_equal 0xf0, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "ORI   i" do
+
+    setup do
+      @cpu.a = 0x5a
+    end
+
+    test "ORI i" do
+      @cpu.mem[0] = 0b11_110_110
+      @cpu.mem[1] = 0xaa
+      @cpu.run 1
+      assert_equal 0xfa, @cpu.a
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
 end
