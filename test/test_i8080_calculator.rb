@@ -685,4 +685,144 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "RLC" do
+
+    test "RLC without overflow" do
+      @cpu.a = 0x5a
+      @cpu.mem[0] = 0b00_000_111
+      @cpu.run 1
+      assert_equal 0xb4, @cpu.a
+      assert_equal false, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RLC with overflow" do
+      @cpu.a = 0xa5
+      @cpu.mem[0] = 0b00_000_111
+      @cpu.run 1
+      assert_equal 0x4b, @cpu.a
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "RRC" do
+
+    test "RRC without overflow" do
+      @cpu.mem[0] = 0b00_001_111
+      @cpu.a = 0x5a
+      @cpu.run 1
+      assert_equal 0x2d, @cpu.a
+      assert_equal false, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RRC borrow overflow" do
+      @cpu.a = 0xa5
+      @cpu.mem[0] = 0b00_001_111
+      @cpu.run 1
+      assert_equal 0xd2, @cpu.a
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "RAL" do
+
+    test "RLC without overflow and no carry" do
+      @cpu.mem[0] = 0b00_010_111
+      @cpu.a = 0x5a
+      @cpu.run 1
+      assert_equal 0xb4, @cpu.a
+      assert_equal false, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RLC without overflow and carry" do
+      @cpu.mem[0] = 0b00_010_111
+      @cpu.a = 0x5a
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0xb5, @cpu.a
+      assert_equal false, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RLC with overflow and no carry" do
+      @cpu.mem[0] = 0b00_010_111
+      @cpu.a = 0xa5
+      @cpu.run 1
+      assert_equal 0x4a, @cpu.a
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RLC with overflow and carry" do
+      @cpu.mem[0] = 0b00_010_111
+      @cpu.a = 0xa5
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x4b, @cpu.a
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "RAR" do
+
+    test "RLC without borrow and no carry" do
+      @cpu.mem[0] = 0b00_011_111
+      @cpu.a = 0x5a
+      @cpu.run 1
+      assert_equal 0x2d, @cpu.a
+      assert_equal false, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RAR without borrow and carry" do
+      @cpu.mem[0] = 0b00_011_111
+      @cpu.a = 0x5a
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0xad, @cpu.a
+      assert_equal false, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RAR with overflow and no carry" do
+      @cpu.mem[0] = 0b00_011_111
+      @cpu.a = 0xa5
+      @cpu.run 1
+      assert_equal 0x52, @cpu.a
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "RAR with overflow and carry" do
+      @cpu.mem[0] = 0b00_011_111
+      @cpu.a = 0xa5
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0xd2, @cpu.a
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+  end
+
 end

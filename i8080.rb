@@ -146,6 +146,14 @@ class I8080
       aci_i
     when 0b11_010_110
       sui_i
+    when 0b00_000_111
+      rlc
+    when 0b00_001_111
+      rrc
+    when 0b00_010_111
+      ral
+    when 0b00_011_111
+      rar
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
@@ -336,6 +344,42 @@ class I8080
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) | i, true
     @clock += 7
+  end
+
+  def rlc
+    @pc += 1
+    v = read_r(REG_A) << 1
+    c = v & 0x100 != 0 ? 1 : 0
+    v = v | c
+    write_r REG_A, v, true
+    @clock += 4
+  end
+
+  def ral
+    @pc += 1
+    c = flg_c? ? 1 : 0
+    v = read_r(REG_A) << 1
+    v = v | c
+    write_r REG_A, v, true
+    @clock += 4
+  end
+
+  def rrc
+    @pc += 1
+    v = read_r(REG_A) 
+    c = v & 0x01 != 0 ? 0x180 : 0
+    v = (v >> 1) | c
+    write_r REG_A, v, true
+    @clock += 4
+  end
+
+  def rar
+    @pc += 1
+    v = read_r(REG_A)
+    c = (flg_c? ? 0x80 : 0) | (v & 0x01 != 0 ? 0x100 : 0)
+    v = (v >> 1) | c
+    write_r REG_A, v, true
+    @clock += 4
   end
 
   def mvi_r_i
