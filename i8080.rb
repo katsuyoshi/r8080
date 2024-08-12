@@ -154,6 +154,24 @@ class I8080
       ral
     when 0b00_011_111
       rar
+    when 0b11_000_011
+      jmp_i
+    when 0b11_011_010
+      jc_i
+    when 0b11_010_010
+      jnc_i
+    when 0b11_001_010
+      jz_i
+    when 0b11_000_010
+      jnz_i
+    when 0b11_110_010
+      jp_i
+    when 0b11_111_010
+      jm_i
+    when 0b11_101_010
+      jpe_i
+    when 0b11_100_010
+      jpo_i
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
@@ -405,6 +423,79 @@ class I8080
       @clock += 4
     end
   end
+
+  def jmp_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l
+    @clock += 10
+  end
+
+  def jc_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l if flg_c?
+    @clock += 10
+  end
+
+  def jnc_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l unless flg_c?
+    @clock += 10
+  end
+
+  def jz_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l if flg_z?
+    @clock += 10
+  end
+
+  def jnz_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l unless flg_z?
+    @clock += 10
+  end
+
+  def jp_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l unless flg_s?
+    @clock += 10
+  end
+
+  def jm_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l if flg_s?
+    @clock += 10
+  end
+
+  def jpe_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l unless flg_p?
+    @clock += 10
+  end
+
+  def jpo_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @pc = h << 8 | l if flg_p?
+    @clock += 10
+  end
+
 
   def hlt
     @clock += 7

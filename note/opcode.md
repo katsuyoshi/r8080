@@ -30,15 +30,15 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 00 001 111  RRC              4     4   rotate A right
 - [x] 00 010 111  RAL              4     4   rotate A left through carry
 - [x] 00 011 111  RAR              4     4   rotate A right through carry
-- [ ] 11 000 011  JMP   addr      10    10   jump unconditional
-- [ ] 11 011 010  JC    addr      10    10   jump on carry
-- [ ] 11 010 010  JNC   addr      10    10   jump on no carry
-- [ ] 11 001 010  JZ    addr      10    10   jump on zero
-- [ ] 11 000 010  JNZ   addr      10    10   jump on no zero
-- [ ] 11 110 010  JP    addr      10    10   jump on positive
-- [ ] 11 111 010  JM    addr      10    10   jump on minus
-- [ ] 11 101 010  JPE   addr      10    10   jump on parity even
-- [ ] 11 100 010  JPO   addr      10    10   jump on parity odd
+- [x] 11 000 011  JMP   addr      10    10   jump unconditional
+- [x] 11 011 010  JC    addr      10    10   jump on carry
+- [x] 11 010 010  JNC   addr      10    10   jump on no carry
+- [x] 11 001 010  JZ    addr      10    10   jump on zero
+- [x] 11 000 010  JNZ   addr      10    10   jump on no zero
+- [x] 11 110 010  JP    addr      10    10   jump on positive
+- [x] 11 111 010  JM    addr      10    10   jump on minus
+- [x] 11 101 010  JPE   addr      10    10   jump on parity even
+- [x] 11 100 010  JPO   addr      10    10   jump on parity odd
 - [ ] 11 001 101  CALL  addr      17    17   call unconditional
 - [ ] 11 011 100  CC    addr     11/17 11/17 call on carry
 - [ ] 11 010 100  CNC   addr     11/17 11/17 call on no carry

@@ -825,4 +825,202 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "JMP   i" do
+    
+    test"JMP i" do
+      @cpu.mem[0] = 0b11_000_011
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "JC   i" do
+  
+    test "JC i without carry" do
+      @cpu.mem[0] = 0b11_011_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JC i with carry" do
+      @cpu.mem[0] = 0b11_011_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "JNC   i" do
+  
+    test "JNC i without carry" do
+      @cpu.mem[0] = 0b11_010_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JNC i with carry" do
+      @cpu.mem[0] = 0b11_010_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "JZ   i" do
+  
+    test "JZ i without zero" do
+      @cpu.mem[0] = 0b11_001_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JC i with zero" do
+      @cpu.mem[0] = 0b11_001_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_z = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "JNZ   i" do
+  
+    test "JNZ i without zero" do
+      @cpu.mem[0] = 0b11_000_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JNZ i with zero" do
+      @cpu.mem[0] = 0b11_000_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_z = true
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "JP  i" do
+  
+    test "JP i without sign" do
+      @cpu.mem[0] = 0b11_110_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JP i with sign" do
+      @cpu.mem[0] = 0b11_110_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_s = true
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    sub_test_case "JM  i" do
+  
+      test "JM i without sign" do
+        @cpu.mem[0] = 0b11_111_010
+        @cpu.mem[1] = 0x34
+        @cpu.mem[2] = 0x12
+        @cpu.run 1
+        assert_equal 3, @cpu.pc
+        assert_equal 10, @cpu.clock
+      end
+  
+      test "JM i with sign" do
+        @cpu.mem[0] = 0b11_111_010
+        @cpu.mem[1] = 0x34
+        @cpu.mem[2] = 0x12
+        @cpu.flg_s = true
+        @cpu.run 1
+        assert_equal 0x1234, @cpu.pc
+        assert_equal 10, @cpu.clock
+      end
+  
+    end
+
+  end
+
+  sub_test_case "JPE  i" do
+  
+    test "JPE i without sign" do
+      @cpu.mem[0] = 0b11_101_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JPE i with sign" do
+      @cpu.mem[0] = 0b11_101_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_p = true
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "JPO  i" do
+  
+    test "JPO i without sign" do
+      @cpu.mem[0] = 0b11_100_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "JPO i with sign" do
+      @cpu.mem[0] = 0b11_100_010
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.flg_p = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
+
 end
