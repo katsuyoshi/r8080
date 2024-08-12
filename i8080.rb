@@ -218,14 +218,14 @@ class I8080
   end
 
   def adi_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) + i, true
     @clock += 7
   end
 
   def aci_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     c = flg_c? ? 1 : 0
     write_r REG_A, read_r(REG_A) + i + c, true
@@ -256,14 +256,14 @@ class I8080
   end
 
   def sui_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) - i, true
     @clock += 7
   end
 
   def sbi_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     b = flg_c? ? 1 : 0
     write_r REG_A, read_r(REG_A) - i - b, true
@@ -304,7 +304,7 @@ class I8080
   end
 
   def ani_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) & i, true
     @clock += 7
@@ -322,7 +322,7 @@ class I8080
   end
 
   def xri_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) ^ i, true
     @clock += 7
@@ -340,7 +340,7 @@ class I8080
   end
 
   def ori_i
-    v = @mem[@pc]; @pc += 1
+    @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) | i, true
     @clock += 7
