@@ -48,15 +48,15 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 111 100  CM    addr     11/17 11/17 call on minus
 - [x] 11 101 100  CPE   addr     11/17 11/17 call on parity even
 - [x] 11 100 100  CPO   addr     11/17 11/17 call on parity odd
-- [ ] 11 001 001  RET             10    11   return
-- [ ] 11 011 000  RC              5/11  5/11 return on carry
-- [ ] 11 010 000  RNC             5/11  5/11 return on no carry
-- [ ] 11 001 000  RZ              5/11  5/11 return on zero
-- [ ] 11 000 000  RNZ             5/11  5/11 return on no zero
-- [ ] 11 110 000  RP              5/11  5/11 return on positive
-- [ ] 11 111 000  RM              5/11  5/11 return on minus
-- [ ] 11 101 000  RPE             5/11  5/11 return on parity even
-- [ ] 11 100 000  RPO             5/11  5/11 return on parity odd
+- [x] 11 001 001  RET             10    11   return
+- [x] 11 011 000  RC              5/11  5/11 return on carry
+- [x] 11 010 000  RNC             5/11  5/11 return on no carry
+- [x] 11 001 000  RZ              5/11  5/11 return on zero
+- [x] 11 000 000  RNZ             5/11  5/11 return on no zero
+- [x] 11 110 000  RP              5/11  5/11 return on positive
+- [x] 11 111 000  RM              5/11  5/11 return on minus
+- [x] 11 101 000  RPE             5/11  5/11 return on parity even
+- [x] 11 100 000  RPO             5/11  5/11 return on parity odd
 - [ ] 11 vvv 111  RST   vec       11    11   restart
 - [ ] 11 011 011  IN    port      10    10   input
 - [ ] 11 010 011  OUT   port      10    10   output

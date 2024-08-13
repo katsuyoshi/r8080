@@ -190,6 +190,24 @@ class I8080
       cpe_i
     when 0b11_100_100
       cpo_i
+    when 0b11_001_001
+      ret
+    when 0b11_011_000
+      rc
+    when 0b11_010_000
+      rnc
+    when 0b11_001_000
+      rz
+    when 0b11_000_000
+      rnz
+    when 0b11_111_000
+      rm
+    when 0b11_110_000
+      rp
+    when 0b11_101_000
+      rpe
+    when 0b11_100_000
+      rpo
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
@@ -498,6 +516,30 @@ class I8080
   def cpe_i; call_cond flg_p? ; end
   def cpo_i; call_cond !flg_p?; end
 
+  def ret
+    @pc = pop_i16
+    @clock += 10
+  end
+
+  def ret_cond cond
+    if cond
+      @pc = pop_i16
+      @clock += 11
+    else
+      @pc += 1
+      @clock += 5
+    end
+  end
+
+  def rc ; ret_cond flg_c? ; end
+  def rnc; ret_cond !flg_c?; end
+  def rz ; ret_cond flg_z? ; end
+  def rnz; ret_cond !flg_z?; end
+  def rm ; ret_cond flg_s? ; end
+  def rp ; ret_cond !flg_s?; end
+  def rpe; ret_cond flg_p? ; end
+  def rpo; ret_cond !flg_p?; end
+
   def push_i8 i8
     @sp = (@sp - 1) & 0xffff
     @mem[@sp] = i8
@@ -506,6 +548,18 @@ class I8080
   def push_i16 i16
    push_i8 i16 >> 8
    push_i8 i16 & 0xff
+  end
+
+  def pop_i8
+    v = @mem[@sp]
+    @sp = (@sp + 1) & 0xffff
+    v
+  end
+
+  def pop_i16
+    l = pop_i8
+    h = pop_i8
+    h << 8 | l
   end
 
   def hlt

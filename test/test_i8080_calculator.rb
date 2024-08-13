@@ -1022,5 +1022,219 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "RET" do
+    
+    test "RET" do
+      @cpu.mem[0] = 0b11_001_001
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RC" do
+    
+    test "RC without carry" do
+      @cpu.mem[0] = 0b11_011_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+    test "RC with carry" do
+      @cpu.mem[0] = 0b11_011_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RNC" do
+    
+    test "RNC without carry" do
+      @cpu.mem[0] = 0b11_010_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+    test "RNC with carry" do
+      @cpu.mem[0] = 0b11_010_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.flg_c = true
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RZ" do
+    
+    test "RZ without zero" do
+      @cpu.mem[0] = 0b11_001_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+    test "RZ with zero" do
+      @cpu.mem[0] = 0b11_001_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.flg_z = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RNZ" do
+    
+    test "RNZ without zero" do
+      @cpu.mem[0] = 0b11_000_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+    test "RNZ with zero" do
+      @cpu.mem[0] = 0b11_000_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.flg_z = true
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RM" do
+    
+    test "RM without sign" do
+      @cpu.mem[0] = 0b11_111_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+    test "RM with sign" do
+      @cpu.mem[0] = 0b11_111_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.flg_s = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RP" do
+    
+    test "RP without sign" do
+      @cpu.mem[0] = 0b11_110_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+    test "RP with sign" do
+      @cpu.mem[0] = 0b11_110_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.flg_s = true
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RPE" do
+    
+    test "RPE without parity" do
+      @cpu.mem[0] = 0b11_101_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+    test "RPE with parity" do
+      @cpu.mem[0] = 0b11_101_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.flg_p = true
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "RPO" do
+    
+    test "RPO without parity" do
+      @cpu.mem[0] = 0b11_100_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0xfffe
+      @cpu.run 1
+      assert_equal 0x1234, @cpu.pc
+      assert_equal 11, @cpu.clock
+    end
+  
+    test "RPO with parity" do
+      @cpu.mem[0] = 0b11_100_000
+      @cpu.mem[0xfffe] = 0x34
+      @cpu.mem[0xffff] = 0x12
+      @cpu.sp = 0x0000
+      @cpu.flg_p = true
+      @cpu.run 1
+      assert_equal 0x0001, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+  end
+
 
 end
