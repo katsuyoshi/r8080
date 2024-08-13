@@ -240,6 +240,8 @@ class I8080
       ori_i
     when lambda{|v| (v & 0b11_000_111) == 0b11_000_111}
       rst
+    when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
+      lxi_r_i
 
 
 
@@ -460,6 +462,24 @@ class I8080
     else
       @clock += 4
     end
+  end
+
+  def lxi_r_i
+    v = @mem[@pc]; @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    r = (v >> 4) & 0x03
+    case r
+    when 0
+      @b = h; @c = l
+    when 1
+      @d = h; @e = l
+    when 2
+      @h = h; @l = l
+    when 3
+      @sp = h << 8 | l
+    end
+    @clock += 10
   end
 
   def jmp_i

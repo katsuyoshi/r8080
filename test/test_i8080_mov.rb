@@ -169,4 +169,50 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "LXI   r imm" do
+
+    test "LXI B, 0x1234" do
+      @cpu.mem[0] = 0b00_000_001
+      @cpu.mem[1] = 0x34
+      @cpu.mem[2] = 0x12
+      @cpu.run 1
+      assert_equal 0x12, @cpu.b
+      assert_equal 0x34, @cpu.c
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "LXI D, 0x2345" do
+      @cpu.mem[0] = 0b00_010_001
+      @cpu.mem[1] = 0x45
+      @cpu.mem[2] = 0x23
+      @cpu.run 1
+      assert_equal 0x23, @cpu.d
+      assert_equal 0x45, @cpu.e
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "LXI H, 0x3456" do
+      @cpu.mem[0] = 0b00_100_001
+      @cpu.mem[1] = 0x56
+      @cpu.mem[2] = 0x34
+      @cpu.run 1
+      assert_equal 0x34, @cpu.h
+      assert_equal 0x56, @cpu.l
+      assert_equal 3, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "LXI SP, 0x4567" do
+      @cpu.mem[0] = 0b00_110_001
+      @cpu.mem[1] = 0x67
+      @cpu.mem[2] = 0x45
+      @cpu.run 1
+      assert_equal 0x4567, @cpu.sp
+      assert_equal 10, @cpu.clock
+    end
+
+  end
+
 end

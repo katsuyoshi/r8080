@@ -60,7 +60,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 vvv 111  RST   vec       11    11   restart
 - [ ] 11 011 011  IN    port      10    10   input
 - [ ] 11 010 011  OUT   port      10    10   output
-- [ ] 00 pp0 001  LXI   rp, imm16 10    10   load imediate register pair
+- [x] 00 pp0 001  LXI   rp, imm16 10    10   load imediate register pair
 - [ ] 11 pp0 101  PUSH  rr        11    11   push register pair on stack
 - [ ] 11 pp0 001  POP   rr        10    10   pop register pair off stack
 - [ ] 00 110 010  STA   addr      13    13   store A direct
