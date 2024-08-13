@@ -57,7 +57,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 111 000  RM              5/11  5/11 return on minus
 - [x] 11 101 000  RPE             5/11  5/11 return on parity even
 - [x] 11 100 000  RPO             5/11  5/11 return on parity odd
-- [ ] 11 vvv 111  RST   vec       11    11   restart
+- [x] 11 vvv 111  RST   vec       11    11   restart
 - [ ] 11 011 011  IN    port      10    10   input
 - [ ] 11 010 011  OUT   port      10    10   output
 - [ ] 00 pp0 001  LXI   rp, imm16 10    10   load imediate register pair

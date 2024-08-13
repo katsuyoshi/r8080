@@ -239,4 +239,40 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "rst" do
+
+    test "rst 0" do
+      @cpu.mem[0] = 0b11_000_111
+      @cpu.run 1
+      assert_equal 0x0000, @cpu.pc
+      assert_equal 0xfffe, @cpu.sp
+      assert_equal 0x01, @cpu.mem[@cpu.sp + 0]
+      assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
+      assert_equal 11, @cpu.clock
+    end
+
+
+    test "rst 1" do
+      @cpu.mem[0] = 0b11_001_111
+      @cpu.run 1
+      assert_equal 0x0008, @cpu.pc
+      assert_equal 0xfffe, @cpu.sp
+      assert_equal 0x01, @cpu.mem[@cpu.sp + 0]
+      assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
+      assert_equal 11, @cpu.clock
+    end
+
+    test "rst 7" do
+      @cpu.mem[0] = 0b11_111_111
+      @cpu.run 1
+      assert_equal 0x0038, @cpu.pc
+      assert_equal 0xfffe, @cpu.sp
+      assert_equal 0x01, @cpu.mem[@cpu.sp + 0]
+      assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
+      assert_equal 11, @cpu.clock
+    end
+
+  end
+
 end
+

@@ -238,6 +238,8 @@ class I8080
       xri_i
     when lambda{|v| (v & 0b11_111_000) == 0b11_110_000}
       ori_i
+    when lambda{|v| (v & 0b11_000_111) == 0b11_000_111}
+      rst
 
 
 
@@ -539,6 +541,14 @@ class I8080
   def rp ; ret_cond !flg_s?; end
   def rpe; ret_cond flg_p? ; end
   def rpo; ret_cond !flg_p?; end
+
+  def rst
+    v = @mem[@pc]; @pc += 1
+    push_i16 @pc
+    v = ((v >> 3) & 0x07) << 3
+    @pc = v
+    @clock += 11
+  end
 
   def push_i8 i8
     @sp = (@sp - 1) & 0xffff
