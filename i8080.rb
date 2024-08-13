@@ -172,6 +172,24 @@ class I8080
       jpe_i
     when 0b11_100_010
       jpo_i
+    when 0b11_001_101
+      call_i
+    when 0b11_011_100
+      cc_i
+    when 0b11_010_100
+      cnc_i
+    when 0b11_001_100
+      cz_i
+    when 0b11_000_100
+      cnz_i
+    when 0b11_111_100
+      cm_i
+    when 0b11_110_100
+      cp_i
+    when 0b11_101_100
+      cpe_i
+    when 0b11_100_100
+      cpo_i
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
@@ -496,6 +514,46 @@ class I8080
     @clock += 10
   end
 
+  def call_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    push_i16 @pc
+    @pc = h << 8 | l
+    @clock += 17
+  end
+
+  def call_cond cond
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    if cond
+      push_i16 @pc
+      @pc = h << 8 | l
+      @clock += 17
+    else
+      @clock += 11
+    end
+  end
+
+  def cc_i ; call_cond flg_c? ; end
+  def cnc_i; call_cond !flg_c?; end
+  def cz_i ; call_cond flg_z? ; end
+  def cnz_i; call_cond !flg_z?; end
+  def cm_i ; call_cond flg_s? ; end
+  def cp_i ; call_cond !flg_s?; end
+  def cpe_i; call_cond flg_p? ; end
+  def cpo_i; call_cond !flg_p?; end
+
+  def push_i8 i8
+    @sp = (@sp - 1) & 0xffff
+    @mem[@sp] = i8
+  end
+
+  def push_i16 i16
+   push_i8 i16 >> 8
+   push_i8 i16 & 0xff
+  end
 
   def hlt
     @clock += 7

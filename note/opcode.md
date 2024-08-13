@@ -39,15 +39,15 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 111 010  JM    addr      10    10   jump on minus
 - [x] 11 101 010  JPE   addr      10    10   jump on parity even
 - [x] 11 100 010  JPO   addr      10    10   jump on parity odd
-- [ ] 11 001 101  CALL  addr      17    17   call unconditional
-- [ ] 11 011 100  CC    addr     11/17 11/17 call on carry
-- [ ] 11 010 100  CNC   addr     11/17 11/17 call on no carry
-- [ ] 11 001 100  CZ    addr     11/17 11/17 call on zero
-- [ ] 11 000 100  CNZ   addr     11/17 11/17 call on no zero
-- [ ] 11 110 100  CP    addr     11/17 11/17 call on positive
-- [ ] 11 111 100  CM    addr     11/17 11/17 call on minus
-- [ ] 11 101 100  CPE   addr     11/17 11/17 call on parity even
-- [ ] 11 100 100  CPO   addr     11/17 11/17 call on parity odd
+- [x] 11 001 101  CALL  addr      17    17   call unconditional
+- [x] 11 011 100  CC    addr     11/17 11/17 call on carry
+- [x] 11 010 100  CNC   addr     11/17 11/17 call on no carry
+- [x] 11 001 100  CZ    addr     11/17 11/17 call on zero
+- [x] 11 000 100  CNZ   addr     11/17 11/17 call on no zero
+- [x] 11 110 100  CP    addr     11/17 11/17 call on positive
+- [x] 11 111 100  CM    addr     11/17 11/17 call on minus
+- [x] 11 101 100  CPE   addr     11/17 11/17 call on parity even
+- [x] 11 100 100  CPO   addr     11/17 11/17 call on parity odd
 - [ ] 11 001 001  RET             10    11   return
 - [ ] 11 011 000  RC              5/11  5/11 return on carry
 - [ ] 11 010 000  RNC             5/11  5/11 return on no carry
