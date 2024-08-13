@@ -450,69 +450,22 @@ class I8080
     @clock += 10
   end
 
-  def jc_i
+  def jmp_cond cond
     @pc += 1
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l if flg_c?
+    @pc = h << 8 | l if cond
     @clock += 10
   end
 
-  def jnc_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l unless flg_c?
-    @clock += 10
-  end
-
-  def jz_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l if flg_z?
-    @clock += 10
-  end
-
-  def jnz_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l unless flg_z?
-    @clock += 10
-  end
-
-  def jp_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l unless flg_s?
-    @clock += 10
-  end
-
-  def jm_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l if flg_s?
-    @clock += 10
-  end
-
-  def jpe_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l unless flg_p?
-    @clock += 10
-  end
-
-  def jpo_i
-    @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    @pc = h << 8 | l if flg_p?
-    @clock += 10
-  end
+  def jc_i ; jmp_cond flg_c? ; end
+  def jnc_i; jmp_cond !flg_c?; end
+  def jz_i ; jmp_cond flg_z? ; end
+  def jnz_i; jmp_cond !flg_z?; end
+  def jp_i ; jmp_cond !flg_s?; end
+  def jm_i ; jmp_cond flg_s? ; end
+  def jpe_i; jmp_cond flg_p?; end
+  def jpo_i; jmp_cond !flg_p? ; end
 
   def call_i
     @pc += 1

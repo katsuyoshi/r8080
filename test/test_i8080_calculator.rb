@@ -983,7 +983,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
       @cpu.run 1
-      assert_equal 0x1234, @cpu.pc
+      assert_equal 3, @cpu.pc
       assert_equal 10, @cpu.clock
     end
 
@@ -993,7 +993,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[2] = 0x12
       @cpu.flg_p = true
       @cpu.run 1
-      assert_equal 3, @cpu.pc
+      assert_equal 0x1234, @cpu.pc
       assert_equal 10, @cpu.clock
     end
 
@@ -1001,22 +1001,22 @@ class TestI8080 < Test::Unit::TestCase
 
   sub_test_case "JPO  i" do
   
-    test "JPO i without sign" do
+    test "JPO i without parity" do
       @cpu.mem[0] = 0b11_100_010
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
       @cpu.run 1
-      assert_equal 3, @cpu.pc
+      assert_equal 0x1234, @cpu.pc
       assert_equal 10, @cpu.clock
     end
 
-    test "JPO i with sign" do
+    test "JPO i with parity" do
       @cpu.mem[0] = 0b11_100_010
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
       @cpu.flg_p = true
       @cpu.run 1
-      assert_equal 0x1234, @cpu.pc
+      assert_equal 3, @cpu.pc
       assert_equal 10, @cpu.clock
     end
 
