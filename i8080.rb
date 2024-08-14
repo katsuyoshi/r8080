@@ -14,6 +14,12 @@ class I8080
   REG_L = 5
   REG_M = 6
 
+  REG_PAIR_BC = 0
+  REG_PAIR_DE = 1
+  REG_PAIR_HL = 2
+  REG_PAIR_SP = 3
+  REG_PAIR_PSW = 3
+
   FLG_S  = 0x80
   FLG_Z  = 0x40
   FLG_H = 0x10
@@ -355,13 +361,13 @@ class I8080
     v = @mem[@pc]; @pc += 1
     r = (v >> 4) & 0x03
     case r
-    when 0
+    when REG_PAIR_BC
       self.hl += self.bc
-    when 1
+    when REG_PAIR_DE
       self.hl += self.de
-    when 2
+    when REG_PAIR_HL
       self.hl += self.hl
-    when 3
+    when REG_PAIR_SP
       self.hl += @sp
     end
     self.flg_c = (self.hl & 0xffff0000) != 0
@@ -511,13 +517,13 @@ class I8080
     h = @mem[@pc]; @pc += 1
     r = (v >> 4) & 0x03
     case r
-    when 0
+    when REG_PAIR_BC
       @b = h; @c = l
-    when 1
+    when REG_PAIR_DE
       @d = h; @e = l
-    when 2
+    when REG_PAIR_HL
       @h = h; @l = l
-    when 3
+    when REG_PAIR_SP
       @sp = h << 8 | l
     end
     @clock += 10
@@ -659,13 +665,13 @@ class I8080
     v = @mem[@pc]; @pc += 1
     r = (v >> 4) & 0x03
     case r
-    when 0
+    when REG_PAIR_BC
       push_i16 bc
-    when 1
+    when REG_PAIR_DE
       push_i16 de
-    when 2
+    when REG_PAIR_HL
       push_i16 hl
-    when 3
+    when REG_PAIR_PSW
       push_i16 psw
     end
     @clock += 11
@@ -675,14 +681,13 @@ class I8080
     v = @mem[@pc]; @pc += 1
     r = (v >> 4) & 0x03
     case r
-    when 0
-      v = pop_i16
-      self.bc = v
-    when 1
+    when REG_PAIR_BC
+      self.bc = pop_i16
+    when REG_PAIR_DE
       self.de = pop_i16
-    when 2
+    when REG_PAIR_HL
       self.hl = pop_i16
-    when 3
+    when REG_PAIR_PSW
       self.psw = pop_i16
     end
     @clock += 10
