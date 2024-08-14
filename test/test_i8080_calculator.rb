@@ -1236,5 +1236,62 @@ class TestI8080 < Test::Unit::TestCase
   
   end
 
+  sub_test_case "DAD   rp" do
+
+    test "DAD B" do
+      @cpu.bc = 0x1234
+      @cpu.hl = 0x4321
+      @cpu.mem[0] = 0b00_001_001
+      @cpu.run 1
+      assert_equal false, @cpu.flg_c?
+      assert_equal 0x5555, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "DAD B overflow case" do
+      @cpu.bc = 0x8000
+      @cpu.hl = 0x8000
+      @cpu.mem[0] = 0b00_001_001
+      @cpu.run 1
+      assert_equal true, @cpu.flg_c?
+      assert_equal 0x0000, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "DAD D" do
+      @cpu.de = 0x1234
+      @cpu.hl = 0x4321
+      @cpu.mem[0] = 0b00_011_001
+      @cpu.run 1
+      assert_equal false, @cpu.flg_c?
+      assert_equal 0x5555, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "DAD H" do
+      @cpu.hl = 0x1234
+      @cpu.mem[0] = 0b00_101_001
+      @cpu.run 1
+      assert_equal false, @cpu.flg_c?
+      assert_equal 0x2468, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "DAD SP" do
+      @cpu.sp = 0x1234
+      @cpu.hl = 0x4321
+      @cpu.mem[0] = 0b00_111_001
+      @cpu.run 1
+      assert_equal false, @cpu.flg_c?
+      assert_equal 0x5555, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+  end
 
 end

@@ -229,9 +229,11 @@ class I8080
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
     when lambda{|v| (v & 0b11_001_111) == 0b11_000_101}
-      push_rr
+      push_rp
     when lambda{|v| (v & 0b11_001_111) == 0b11_000_001}
-      pop_rr
+      pop_rp
+    when lambda{|v| (v & 0b11_001_111) == 0b00_001_001}
+      dad_rp
 
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
@@ -347,6 +349,24 @@ class I8080
     b = flg_c? ? 1 : 0
     write_r REG_A, read_r(REG_A) - i - b, true
     @clock += 7
+  end
+
+  def dad_rp
+    v = @mem[@pc]; @pc += 1
+    r = (v >> 4) & 0x03
+    case r
+    when 0
+      self.hl += self.bc
+    when 1
+      self.hl += self.de
+    when 2
+      self.hl += self.hl
+    when 3
+      self.hl += @sp
+    end
+    self.flg_c = (self.hl & 0xffff0000) != 0
+    self.hl &= 0xffff
+    @clock += 10
   end
 
   def dcr_r
@@ -635,7 +655,7 @@ class I8080
     @clock += 11
   end
 
-  def push_rr
+  def push_rp
     v = @mem[@pc]; @pc += 1
     r = (v >> 4) & 0x03
     case r
@@ -651,7 +671,7 @@ class I8080
     @clock += 11
   end
 
-  def pop_rr
+  def pop_rp
     v = @mem[@pc]; @pc += 1
     r = (v >> 4) & 0x03
     case r
