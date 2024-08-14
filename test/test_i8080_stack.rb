@@ -113,4 +113,21 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "XTHL" do
+
+    test "XTHL" do
+      @cpu.mem[0] = 0b11_100_011
+      @cpu.h = 0x22
+      @cpu.l = 0x33
+      @cpu._push_i16 0x4455
+      @cpu.run 1
+      assert_equal 0x4455, @cpu.hl
+      assert_equal 0x33, @cpu.mem[0xfffe]
+      assert_equal 0x22, @cpu.mem[0xffff]
+      assert_equal 1, @cpu.pc
+      assert_equal 18, @cpu.clock
+    end
+
+  end
+
 end

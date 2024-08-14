@@ -258,6 +258,8 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x78, @cpu.l
       assert_equal 0x12, @cpu.d
       assert_equal 0x34, @cpu.e
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
     end
 
   end
