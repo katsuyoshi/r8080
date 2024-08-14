@@ -64,7 +64,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 pp0 101  PUSH  rr        11    11   push register pair on stack
 - [x] 11 pp0 001  POP   rr        10    10   pop register pair off stack
 - [x] 00 110 010  STA   addr      13    13   store A direct
-- [ ] 00 111 010  LDA   addr      13    13   load A direct
+- [x] 00 111 010  LDA   addr      13    13   load A direct
 - [ ] 11 101 011  XCHG             4     4   exchange D & E, H & L registers
 - [ ] 11 100 011  XTHL            18    17   exchange top of stack, H & L
 - [ ] 11 111 001  SPHL             5     4   H & L to stack pointer

@@ -230,4 +230,19 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "LDA   imm" do
+
+    test "LDA 8000" do
+      @cpu.mem[0] = 0b00_111_010
+      @cpu.mem[1] = 0x00
+      @cpu.mem[2] = 0x80
+      @cpu.mem[0x8000] = 0x12
+      @cpu.run 1
+      assert_equal 0x12, @cpu.a
+      assert_equal 3, @cpu.pc
+      assert_equal 13, @cpu.clock
+    end
+
+  end
+
 end

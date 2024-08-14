@@ -215,6 +215,8 @@ class I8080
       rpo
     when 0b00_110_010
       sta_i
+    when 0b00_111_010
+      lda_i
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -498,6 +500,14 @@ class I8080
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
     @mem[h << 8 | l] = @a
+    @clock += 13
+  end
+
+  def lda_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @a = @mem[h << 8 | l]
     @clock += 13
   end
 
