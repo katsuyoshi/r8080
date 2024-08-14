@@ -130,4 +130,18 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "SPHL" do
+      
+      test "SPHL" do
+        @cpu.mem[0] = 0b11_111_001
+        @cpu.h = 0x22
+        @cpu.l = 0x33
+        @cpu.run 1
+        assert_equal 0x2233, @cpu.sp
+        assert_equal 1, @cpu.pc
+        assert_equal 5, @cpu.clock
+      end
+  
+    end 
+
 end

@@ -221,6 +221,8 @@ class I8080
       xchg
     when 0b11_100_011
       xthl
+    when 0b11_111_001
+      sphl
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -529,6 +531,12 @@ class I8080
     push_i16 self.hl
     self.hl = t
     @clock += 18
+  end
+
+  def sphl
+    @pc += 1
+    @sp = self.hl
+    @clock += 5
   end
 
   def jmp_i
