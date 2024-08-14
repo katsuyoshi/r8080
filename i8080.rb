@@ -208,6 +208,12 @@ class I8080
       rpe
     when 0b11_100_000
       rpo
+
+    when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
+      lxi_r_i
+    when lambda{|v| (v & 0b11_001_111) == 0b11_000_101}
+      push_rr
+
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
@@ -240,10 +246,6 @@ class I8080
       ori_i
     when lambda{|v| (v & 0b11_000_111) == 0b11_000_111}
       rst
-    when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
-      lxi_r_i
-
-
 
     end
 
@@ -569,6 +571,23 @@ class I8080
     @pc = v
     @clock += 11
   end
+
+  def push_rr
+    v = @mem[@pc]; @pc += 1
+    r = (v >> 4) & 0x03
+    case r
+    when 0
+      push_i16 bc
+    when 1
+      push_i16 de
+    when 2
+      push_i16 hl
+    when 3
+      push_i16 psw
+    end
+    @clock += 11
+  end
+
 
   def push_i8 i8
     @sp = (@sp - 1) & 0xffff
