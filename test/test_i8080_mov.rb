@@ -215,4 +215,19 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "STA   imm" do
+
+    test "STA 8000" do
+      @cpu.mem[0] = 0b00_110_010
+      @cpu.mem[1] = 0x00
+      @cpu.mem[2] = 0x80
+      @cpu.a = 0x12
+      @cpu.run 1
+      assert_equal 0x12, @cpu.mem[0x8000]
+      assert_equal 3, @cpu.pc
+      assert_equal 13, @cpu.clock
+    end
+
+  end
+
 end

@@ -213,6 +213,8 @@ class I8080
       rpe
     when 0b11_100_000
       rpo
+    when 0b00_110_010
+      sta_i
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -489,6 +491,14 @@ class I8080
       @sp = h << 8 | l
     end
     @clock += 10
+  end
+
+  def sta_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @mem[h << 8 | l] = @a
+    @clock += 13
   end
 
   def jmp_i
