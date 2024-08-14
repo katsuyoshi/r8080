@@ -68,7 +68,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 101 011  XCHG             4     4   exchange D & E, H & L registers
 - [x] 11 100 011  XTHL            18    17   exchange top of stack, H & L
 - [x] 11 111 001  SPHL             5     4   H & L to stack pointer
-- [ ] 11 101 001  PCHL             5     5   H & L to program counter
+- [x] 11 101 001  PCHL             5     5   H & L to program counter
 - [ ] 00 pp1 001  DAD   rp        10    11   add register pair to H & L
 - [ ] 00 pp0 010  STAX  rx         7     7   store A indirect
 - [ ] 00 pp1 010  LDAX  rx         7     7   load A indirect

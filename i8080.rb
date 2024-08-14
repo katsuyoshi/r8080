@@ -223,6 +223,8 @@ class I8080
       xthl
     when 0b11_111_001
       sphl
+    when 0b11_101_001
+      pchl
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -536,6 +538,12 @@ class I8080
   def sphl
     @pc += 1
     @sp = self.hl
+    @clock += 5
+  end
+
+  def pchl
+    @pc += 1
+    @pc = self.hl
     @clock += 5
   end
 
