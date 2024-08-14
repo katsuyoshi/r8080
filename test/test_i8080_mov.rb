@@ -245,4 +245,22 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "XCHG" do
+
+    test "XCHG" do
+      @cpu.mem[0] = 0b11_101_011
+      @cpu.h = 0x12
+      @cpu.l = 0x34
+      @cpu.d = 0x56
+      @cpu.e = 0x78
+      @cpu.run 1
+      assert_equal 0x56, @cpu.h
+      assert_equal 0x78, @cpu.l
+      assert_equal 0x12, @cpu.d
+      assert_equal 0x34, @cpu.e
+    end
+
+  end
+
+
 end

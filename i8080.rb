@@ -217,6 +217,8 @@ class I8080
       sta_i
     when 0b00_111_010
       lda_i
+    when 0b11_101_011
+      xchg
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -509,6 +511,13 @@ class I8080
     h = @mem[@pc]; @pc += 1
     @a = @mem[h << 8 | l]
     @clock += 13
+  end
+
+  def xchg
+    t = self.de
+    self.de = self.hl
+    self.hl = t
+    @clock += 4
   end
 
   def jmp_i
