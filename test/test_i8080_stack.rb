@@ -1,6 +1,10 @@
 require 'test/unit'
 require 'i8080'
 
+class I8080
+  def _push_i16 data; push_i16 data; end
+end 
+
 class TestI8080 < Test::Unit::TestCase
 
   setup do
@@ -57,6 +61,54 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x11, @cpu.mem[@cpu.sp + 1]
       assert_equal 1, @cpu.pc
       assert_equal 11, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "POP" do
+
+    test "POP B" do
+      @cpu.mem[0] = 0b11_000_001
+      @cpu._push_i16 0x2233
+      @cpu.run 1
+      assert_equal 0x0000, @cpu.sp
+      assert_equal 0x33, @cpu.c
+      assert_equal 0x22, @cpu.b
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "POP D" do
+      @cpu.mem[0] = 0b11_010_001
+      @cpu._push_i16 0x4455
+      @cpu.run 1
+      assert_equal 0x0000, @cpu.sp
+      assert_equal 0x55, @cpu.e
+      assert_equal 0x44, @cpu.d
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "POP H" do
+      @cpu.mem[0] = 0b11_100_001
+      @cpu._push_i16 0x6677
+      @cpu.run 1
+      assert_equal 0x0000, @cpu.sp
+      assert_equal 0x77, @cpu.l
+      assert_equal 0x66, @cpu.h
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
+    end
+
+    test "POP PSW" do
+      @cpu.mem[0] = 0b11_110_001
+      @cpu._push_i16 0x1102
+      @cpu.run 1
+      assert_equal 0x0000, @cpu.sp
+      assert_equal 0x02, @cpu.f
+      assert_equal 0x11, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 10, @cpu.clock
     end
 
   end

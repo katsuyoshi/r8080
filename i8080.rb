@@ -39,9 +39,14 @@ class I8080
   end
 
   def psw; @a << 8 | @f; end
-  def bc; @b << 8 | @c; end
-  def de; @d << 8 | @e; end
-  def hl; @h << 8 | @l; end
+  def bc;  @b << 8 | @c; end
+  def de;  @d << 8 | @e; end
+  def hl;  @h << 8 | @l; end
+
+  def psw=v; @a = v >> 8; @f = v & 0xff; end
+  def bc=v;  @b = v >> 8; @c = v & 0xff; end
+  def de=v;  @d = v >> 8; @e = v & 0xff; end
+  def hl=v;  @h = v >> 8; @l = v & 0xff; end
 
   # --- dump register
 
@@ -213,6 +218,8 @@ class I8080
       lxi_r_i
     when lambda{|v| (v & 0b11_001_111) == 0b11_000_101}
       push_rr
+    when lambda{|v| (v & 0b11_001_111) == 0b11_000_001}
+      pop_rr
 
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
@@ -588,6 +595,22 @@ class I8080
     @clock += 11
   end
 
+  def pop_rr
+    v = @mem[@pc]; @pc += 1
+    r = (v >> 4) & 0x03
+    case r
+    when 0
+      v = pop_i16
+      self.bc = v
+    when 1
+      self.de = pop_i16
+    when 2
+      self.hl = pop_i16
+    when 3
+      self.psw = pop_i16
+    end
+    @clock += 10
+  end
 
   def push_i8 i8
     @sp = (@sp - 1) & 0xffff
