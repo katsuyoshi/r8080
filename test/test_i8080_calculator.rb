@@ -1334,4 +1334,45 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "DCX   rp" do
+
+    test "DCX B" do
+      @cpu.bc = 0x1234
+      @cpu.mem[0] = 0b00_001_011
+      @cpu.run 1
+      assert_equal 0x1233, @cpu.bc
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+    test "DCX D" do
+      @cpu.de = 0x1234
+      @cpu.mem[0] = 0b00_011_011
+      @cpu.run 1
+      assert_equal 0x1233, @cpu.de
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+    test "DCX H" do
+      @cpu.hl = 0x1234
+      @cpu.mem[0] = 0b00_101_011
+      @cpu.run 1
+      assert_equal 0x1233, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+    
+    test "DCX SP" do
+      @cpu.sp = 0x1234
+      @cpu.mem[0] = 0b00_111_011
+      @cpu.run 1
+      assert_equal 0x1233, @cpu.sp
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+    
+
+  end
+
 end
