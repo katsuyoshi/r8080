@@ -75,7 +75,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 00 pp0 011  INX   rp         5     5   increment register pair
 - [x] 00 pp1 011  DCX   rp         5     5   decrement register pair
 - [x] 00 101 111  CMA              4     4   complement A
-- [ ] 00 110 111  STC              4     4   set carry
+- [x] 00 110 111  STC              4     4   set carry
 - [ ] 00 111 111  CMC              4     4   complement carry
 - [ ] 00 100 111  DAA              4     4   decimal adjust A
 - [ ] 00 100 010  SHLD  addr      16    16   store H & L direct

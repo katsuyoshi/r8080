@@ -329,4 +329,16 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "STC" do
+
+    test "STC" do
+      @cpu.mem[0] = 0b00_110_111
+      @cpu.run 1
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+  end
+
 end

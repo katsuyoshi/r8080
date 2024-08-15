@@ -237,6 +237,8 @@ class I8080
       ldax_rp
     when 0b00_101_111
       cma
+    when 0b00_110_111
+      stc
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -444,7 +446,7 @@ class I8080
     @a = ~@a & 0xff
     @clock += 4
   end
-  
+
   def ana_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
@@ -785,6 +787,12 @@ class I8080
     l = pop_i8
     h = pop_i8
     h << 8 | l
+  end
+
+  def stc
+    @pc += 1
+    self.flg_c = true
+    @clock += 4
   end
 
   def hlt
