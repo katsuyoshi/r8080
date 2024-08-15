@@ -244,6 +244,8 @@ class I8080
       pop_rp
     when lambda{|v| (v & 0b11_001_111) == 0b00_001_001}
       dad_rp
+    when lambda{|v| (v & 0b11_001_111) == 0b00_000_011}
+      inx_rp
 
     when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
       mov_r_r
@@ -399,6 +401,22 @@ class I8080
     else
       @clock += 5
     end
+  end
+
+  def inx_rp
+    v = @mem[@pc]; @pc += 1
+    r = (v >> 4) & 0x03
+    case r
+    when REG_PAIR_BC
+      self.bc += 1
+    when REG_PAIR_DE
+      self.de += 1
+    when REG_PAIR_HL
+      self.hl += 1
+    when REG_PAIR_SP
+      @sp += 1
+    end
+    @clock += 5
   end
 
   def ana_r

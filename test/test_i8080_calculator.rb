@@ -1294,4 +1294,44 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "INX   rp" do
+
+    test "INX B" do
+      @cpu.bc = 0x1234
+      @cpu.mem[0] = 0b00_000_011
+      @cpu.run 1
+      assert_equal 0x1235, @cpu.bc
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+    test "INX D" do
+      @cpu.de = 0x1234
+      @cpu.mem[0] = 0b00_010_011
+      @cpu.run 1
+      assert_equal 0x1235, @cpu.de
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+    test "INX H" do
+      @cpu.hl = 0x1234
+      @cpu.mem[0] = 0b00_100_011
+      @cpu.run 1
+      assert_equal 0x1235, @cpu.hl
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+    test "INX SP" do
+      @cpu.sp = 0x1234
+      @cpu.mem[0] = 0b00_110_011
+      @cpu.run 1
+      assert_equal 0x1235, @cpu.sp
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+  end
+
 end
