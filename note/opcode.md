@@ -71,7 +71,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 101 001  PCHL             5     5   H & L to program counter
 - [x] 00 pp1 001  DAD   rp        10    11   add register pair to H & L
 - [x] 00 pp0 010  STAX  rx         7     7   store A indirect
-- [ ] 00 pp1 010  LDAX  rx         7     7   load A indirect
+- [x] 00 pp1 010  LDAX  rx         7     7   load A indirect
 - [ ] 00 pp0 011  INX   rp         5     5   increment register pair
 - [ ] 00 pp1 011  DCX   rp         5     5   decrement register pair
 - [ ] 00 101 111  CMA              4     4   complement A

@@ -303,4 +303,30 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "LDAX   rp" do
+
+    test "LDAX B" do
+      @cpu.mem[0] = 0b00_001_010
+      @cpu.b = 0x12
+      @cpu.c = 0x34
+      @cpu.mem[0x1234] = 0x56
+      @cpu.run 1
+      assert_equal 0x56, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "LDAX D" do
+      @cpu.mem[0] = 0b00_011_010
+      @cpu.d = 0x12
+      @cpu.e = 0x34
+      @cpu.mem[0x1234] = 0x56
+      @cpu.run 1
+      assert_equal 0x56, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
 end

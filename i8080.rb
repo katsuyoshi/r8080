@@ -233,6 +233,8 @@ class I8080
       pchl
     when 0b00_000_010, 0b00_010_010
       stax_rp
+    when 0b00_001_010, 0b00_011_010
+      ldax_rp
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -555,6 +557,18 @@ class I8080
       @mem[bc] = @a
     when REG_PAIR_DE
       @mem[de] = @a
+    end
+    @clock += 7
+  end
+
+  def ldax_rp
+    v = @mem[@pc]; @pc += 1
+    r = (v >> 4) & 0x03
+    case r
+    when REG_PAIR_BC
+      @a = @mem[bc]
+    when REG_PAIR_DE
+      @a = @mem[de]
     end
     @clock += 7
   end
