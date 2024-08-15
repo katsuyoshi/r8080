@@ -341,4 +341,22 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "CMC" do
+
+    test "CMC" do
+      @cpu.mem[0] = 0b00_111_111
+      @cpu.run 1
+      assert_equal true, @cpu.flg_c?
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+
+      @cpu.mem[1] = 0b00_111_111
+      @cpu.run 1
+      assert_equal false, @cpu.flg_c?
+      assert_equal 2, @cpu.pc
+      assert_equal 8, @cpu.clock
+    end
+
+  end
+
 end

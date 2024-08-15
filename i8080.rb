@@ -239,6 +239,8 @@ class I8080
       cma
     when 0b00_110_111
       stc
+    when 0b00_111_111
+      cmc
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -792,6 +794,12 @@ class I8080
   def stc
     @pc += 1
     self.flg_c = true
+    @clock += 4
+  end
+
+  def cmc
+    @pc += 1
+    self.flg_c = !flg_c?
     @clock += 4
   end
 
