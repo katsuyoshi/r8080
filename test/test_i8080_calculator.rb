@@ -1372,6 +1372,18 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 5, @cpu.clock
     end
     
+  end
+
+  sub_test_case "CMA" do
+
+    test "CMA" do
+      @cpu.a = 0x55
+      @cpu.mem[0] = 0b00_101_111
+      @cpu.run 1
+      assert_equal 0xaa, @cpu.a
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
 
   end
 

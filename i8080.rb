@@ -235,6 +235,8 @@ class I8080
       stax_rp
     when 0b00_001_010, 0b00_011_010
       ldax_rp
+    when 0b00_101_111
+      cma
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -437,6 +439,12 @@ class I8080
     @clock += 5
   end
 
+  def cma
+    @pc += 1
+    @a = ~@a & 0xff
+    @clock += 4
+  end
+  
   def ana_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
