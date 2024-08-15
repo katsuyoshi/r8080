@@ -277,4 +277,30 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "STAX   rp" do
+
+    test "STAX B" do
+      @cpu.mem[0] = 0b00_000_010
+      @cpu.b = 0x12
+      @cpu.c = 0x34
+      @cpu.a = 0x56
+      @cpu.run 1
+      assert_equal 0x56, @cpu.mem[0x1234]
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "STAX D" do
+      @cpu.mem[0] = 0b00_010_010
+      @cpu.d = 0x12
+      @cpu.e = 0x34
+      @cpu.a = 0x56
+      @cpu.run 1
+      assert_equal 0x56, @cpu.mem[0x1234]
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
 end
