@@ -22,9 +22,9 @@ class I8080
 
   FLG_S  = 0x80
   FLG_Z  = 0x40
-  FLG_H = 0x10
+  FLG_AC = 0x10
   FLG_P  = 0x04
-  FLG_C = 0x01
+  FLG_CY = 0x01
 
 
   def initialize options={}
@@ -92,15 +92,15 @@ class I8080
     end
   end
 
-  def flg_h?
-    (@f & FLG_H) != 0
+  def flg_ac?
+    (@f & FLG_AC) != 0
   end
 
-  def flg_h= f
+  def flg_ac= f
     if f
-      @f |= FLG_H
+      @f |= FLG_AC
     else
-      @f &= ~FLG_H
+      @f &= ~FLG_AC
     end
   end
 
@@ -116,15 +116,15 @@ class I8080
     end
   end
 
-  def flg_c?
-    (@f & FLG_C) != 0
+  def flg_cy?
+    (@f & FLG_CY) != 0
   end
 
-  def flg_c= f
+  def flg_cy= f
     if f
-      @f |= FLG_C
+      @f |= FLG_CY
     else
-      @f &= ~FLG_C
+      @f &= ~FLG_CY
     end
   end
 
@@ -241,6 +241,8 @@ class I8080
       stc
     when 0b00_111_111
       cmc
+    when 0b00_100_111
+      daa
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -298,7 +300,9 @@ class I8080
   def add_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) + read_r(s), true
+    a = read_r(REG_A)
+    b = read_r(s)
+    write_r REG_A, a + b, (a & 0xf) + (b & 0xf), true
     if reg_m? s
       @clock += 7
     else
@@ -308,9 +312,11 @@ class I8080
 
   def adc_r
     v = @mem[@pc]; @pc += 1
-    c = flg_c? ? 1 : 0
+    c = flg_cy? ? 1 : 0
     s = src_r v
-    write_r REG_A, read_r(REG_A) + read_r(s) + c, true
+    a = read_r(REG_A)
+    b = read_r(s)
+    write_r REG_A, a + b + c, (a & 0xf) + (b & 0xf) + c, true
     if reg_m? s
       @clock += 7
     else
@@ -321,22 +327,26 @@ class I8080
   def adi_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    write_r REG_A, read_r(REG_A) + i, true
+    a = read_r(REG_A)
+    write_r REG_A, a + i, (a & 0xf) + (i & 0xf), true
     @clock += 7
   end
 
   def aci_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    c = flg_c? ? 1 : 0
-    write_r REG_A, read_r(REG_A) + i + c, true
+    c = flg_cy? ? 1 : 0
+    a = read_r(REG_A)
+    write_r REG_A, a + i + c, (a & 0xf) + (i & 0xf) + c, true
     @clock += 7
   end
 
   def sub_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) - read_r(s), true
+    a = read_r(REG_A)
+    b = read_r(s)
+    write_r REG_A, a - b, (a & 0xf) - (b & 0xf), true
     if reg_m? s
       @clock += 7
     else
@@ -346,9 +356,11 @@ class I8080
 
   def sbb_r
     v = @mem[@pc]; @pc += 1
-    b = flg_c? ? 1 : 0
+    c = flg_cy? ? 1 : 0
     s = src_r v
-    write_r REG_A, read_r(REG_A) - read_r(s) - b, true
+    a = read_r(REG_A)
+    b = read_r(s)
+    write_r REG_A, a - b - c, (a & 0xf) - (b & 0xf) - c, true
     if reg_m? s
       @clock += 7
     else
@@ -359,15 +371,17 @@ class I8080
   def sui_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    write_r REG_A, read_r(REG_A) - i, true
+    a = read_r(REG_A)
+    write_r REG_A, a - i, (a & 0xf) - (i & 0xf), true
     @clock += 7
   end
 
   def sbi_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    b = flg_c? ? 1 : 0
-    write_r REG_A, read_r(REG_A) - i - b, true
+    c = flg_cy? ? 1 : 0
+    a = read_r(REG_A)
+    write_r REG_A, a - i - c, (a & 0xf) - (i & 0xf) - c, true
     @clock += 7
   end
 
@@ -384,15 +398,30 @@ class I8080
     when REG_PAIR_SP
       self.hl += @sp
     end
-    self.flg_c = (self.hl & 0xffff0000) != 0
+    self.flg_cy = (self.hl & 0xffff0000) != 0
     self.hl &= 0xffff
     @clock += 10
+  end
+
+  def daa
+    @pc += 1
+    v = @a
+    if (v & 0x0f) > 9 || flg_ac?
+      v += 6
+    end
+    if (v & 0xf0) > 0x90 || flg_cy?
+      v += 0x60
+      self.flg_cy = true
+    end
+    write_r REG_A, v, 0, true
+    @clock += 4
   end
 
   def dcr_r
     v = @mem[@pc]; @pc += 1
     d = dst_r v
-    write_r d, read_r(d) - 1, true
+    a = read_r(d)
+    write_r d, a - 1, (a & 0xf) - 1, true
     if reg_m? d
       @clock += 10
     else
@@ -403,7 +432,8 @@ class I8080
   def inr_r
     v = @mem[@pc]; @pc += 1
     d = dst_r v
-    write_r d, read_r(d) + 1, true
+    a = read_r(d)
+    write_r d, a + 1, (a & 0xf) + 1, true
     if reg_m? d
       @clock += 10
     else
@@ -452,7 +482,7 @@ class I8080
   def ana_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) & read_r(s), true
+    write_r REG_A, read_r(REG_A) & read_r(s), 0x10, true
     if reg_m? s
       @clock += 7
     else
@@ -463,14 +493,14 @@ class I8080
   def ani_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    write_r REG_A, read_r(REG_A) & i, true
+    write_r REG_A, read_r(REG_A) & i, 0x10, true
     @clock += 7
   end
 
   def xra_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) ^ read_r(s), true
+    write_r REG_A, read_r(REG_A) ^ read_r(s), 0, true
     if reg_m? s
       @clock += 7
     else
@@ -481,14 +511,14 @@ class I8080
   def xri_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    write_r REG_A, read_r(REG_A) ^ i, true
+    write_r REG_A, read_r(REG_A) ^ i, 0, true
     @clock += 7
   end
 
   def ora_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) | read_r(s), true
+    write_r REG_A, read_r(REG_A) | read_r(s), 0, true
     if reg_m? s
       @clock += 7
     else
@@ -499,7 +529,7 @@ class I8080
   def ori_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    write_r REG_A, read_r(REG_A) | i, true
+    write_r REG_A, read_r(REG_A) | i, 0, true
     @clock += 7
   end
 
@@ -508,16 +538,16 @@ class I8080
     v = read_r(REG_A) << 1
     c = v & 0x100 != 0 ? 1 : 0
     v = v | c
-    write_r REG_A, v, true
+    write_r REG_A, v, 0, true
     @clock += 4
   end
 
   def ral
     @pc += 1
-    c = flg_c? ? 1 : 0
+    c = flg_cy? ? 1 : 0
     v = read_r(REG_A) << 1
     v = v | c
-    write_r REG_A, v, true
+    write_r REG_A, v, 0, true
     @clock += 4
   end
 
@@ -526,16 +556,16 @@ class I8080
     v = read_r(REG_A) 
     c = v & 0x01 != 0 ? 0x180 : 0
     v = (v >> 1) | c
-    write_r REG_A, v, true
+    write_r REG_A, v, 0, true
     @clock += 4
   end
 
   def rar
     @pc += 1
     v = read_r(REG_A)
-    c = (flg_c? ? 0x80 : 0) | (v & 0x01 != 0 ? 0x100 : 0)
+    c = (flg_cy? ? 0x80 : 0) | (v & 0x01 != 0 ? 0x100 : 0)
     v = (v >> 1) | c
-    write_r REG_A, v, true
+    write_r REG_A, v, 0, true
     @clock += 4
   end
 
@@ -543,7 +573,7 @@ class I8080
     v = @mem[@pc]; @pc += 1
     i = @mem[@pc]; @pc += 1
     d = dst_r v
-    write_r d, i
+    write_r d, i, 0
     if reg_m? d
       @clock += 10
     else
@@ -555,7 +585,7 @@ class I8080
     v = @mem[@pc]; @pc += 1
     d = dst_r v
     s = src_r v
-    write_r d, read_r(s)
+    write_r d, read_r(s), 0
     if reg_m?(d) || reg_m?(s)
       @clock += 7
     else
@@ -665,8 +695,8 @@ class I8080
     @clock += 10
   end
 
-  def jc_i ; jmp_cond flg_c? ; end
-  def jnc_i; jmp_cond !flg_c?; end
+  def jc_i ; jmp_cond flg_cy? ; end
+  def jnc_i; jmp_cond !flg_cy?; end
   def jz_i ; jmp_cond flg_z? ; end
   def jnz_i; jmp_cond !flg_z?; end
   def jp_i ; jmp_cond !flg_s?; end
@@ -696,8 +726,8 @@ class I8080
     end
   end
 
-  def cc_i ; call_cond flg_c? ; end
-  def cnc_i; call_cond !flg_c?; end
+  def cc_i ; call_cond flg_cy? ; end
+  def cnc_i; call_cond !flg_cy?; end
   def cz_i ; call_cond flg_z? ; end
   def cnz_i; call_cond !flg_z?; end
   def cm_i ; call_cond flg_s? ; end
@@ -720,8 +750,8 @@ class I8080
     end
   end
 
-  def rc ; ret_cond flg_c? ; end
-  def rnc; ret_cond !flg_c?; end
+  def rc ; ret_cond flg_cy? ; end
+  def rnc; ret_cond !flg_cy?; end
   def rz ; ret_cond flg_z? ; end
   def rnz; ret_cond !flg_z?; end
   def rm ; ret_cond flg_s? ; end
@@ -793,13 +823,13 @@ class I8080
 
   def stc
     @pc += 1
-    self.flg_c = true
+    self.flg_cy = true
     @clock += 4
   end
 
   def cmc
     @pc += 1
-    self.flg_c = !flg_c?
+    self.flg_cy = !self.flg_cy?
     @clock += 4
   end
 
@@ -831,20 +861,26 @@ class I8080
     end
   end
 
-  def write_r r, v, set_f = false
+  def write_r r, v, hv, set_f = false
     v8 = v & 0xff
     case r
     when REG_A
       if set_f
-        vrh = read_r(r) >> 4
-        v8h = v8 >> 4
         self.flg_s = (v8 & FLG_S) == FLG_S
         self.flg_z = (v8 == 0)
-        self.flg_h = vrh != v8h
+        self.flg_cy = (v & 0xff00) != 0
+                
         # odd parity
-        self.flg_p = ((8.times.inject(0){|n,i| n + ((v >> i) & 0x01)}) & 0x01) == 0
-        self.flg_c = (v & 0xff00) != 0
+        bits = v8
+        bits = (bits & 0x55) + (bits >> 1 & 0x55);
+        bits = (bits & 0x33) + (bits >> 2 & 0x33);
+        bits = (bits & 0x0f) + (bits >> 4 & 0x0f);
+        self.flg_p = (bits & 0x01) == 0
+
+        # ac
+        self.flg_ac = (hv & 0xf0) != 0
       end
+
       @a = v8
     when REG_B
       @b = v8
@@ -861,6 +897,7 @@ class I8080
     when REG_M
       @mem[hl] = v8
     end
+
   end
 
 end

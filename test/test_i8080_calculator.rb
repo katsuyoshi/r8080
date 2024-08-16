@@ -270,7 +270,7 @@ class TestI8080 < Test::Unit::TestCase
 
     test "ADC A with Carry" do
       @cpu.mem[0] = 0b10_001_111
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x23, @cpu.a
       assert_equal 1, @cpu.pc
@@ -287,7 +287,7 @@ class TestI8080 < Test::Unit::TestCase
 
     test "ADC B with Carry" do
       @cpu.mem[0] = 0b10_001_000
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x34, @cpu.a
       assert_equal 1, @cpu.pc
@@ -308,7 +308,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.h = 0x80; @cpu.l = 0
       @cpu.mem[0x8000] = 0x88
       @cpu.mem[0] = 0b10_001_110
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x9a, @cpu.a
       assert_equal 1, @cpu.pc
@@ -379,7 +379,7 @@ class TestI8080 < Test::Unit::TestCase
 
     test "SBB A with Borrow" do
       @cpu.mem[0] = 0b10_011_111
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0xff, @cpu.a
       assert_equal 1, @cpu.pc
@@ -396,7 +396,7 @@ class TestI8080 < Test::Unit::TestCase
 
     test "SBB B with Borrow" do
       @cpu.mem[0] = 0b10_011_000
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0xee, @cpu.a
       assert_equal 1, @cpu.pc
@@ -417,7 +417,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.h = 0x80; @cpu.l = 0
       @cpu.mem[0x8000] = 0x88
       @cpu.mem[0] = 0b10_011_110
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x88, @cpu.a
       assert_equal 1, @cpu.pc
@@ -581,7 +581,7 @@ class TestI8080 < Test::Unit::TestCase
     test "ACI i with carry" do
       @cpu.mem[0] = 0b11_001_110
       @cpu.mem[1] = 0x23
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x35, @cpu.a
       assert_equal 2, @cpu.pc
@@ -625,7 +625,7 @@ class TestI8080 < Test::Unit::TestCase
     test "SBI i with borrow" do
       @cpu.mem[0] = 0b11_011_110
       @cpu.mem[1] = 0x11
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x11, @cpu.a
       assert_equal 2, @cpu.pc
@@ -692,7 +692,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b00_000_111
       @cpu.run 1
       assert_equal 0xb4, @cpu.a
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -702,7 +702,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b00_000_111
       @cpu.run 1
       assert_equal 0x4b, @cpu.a
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -716,7 +716,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x5a
       @cpu.run 1
       assert_equal 0x2d, @cpu.a
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -726,7 +726,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b00_001_111
       @cpu.run 1
       assert_equal 0xd2, @cpu.a
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -740,7 +740,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x5a
       @cpu.run 1
       assert_equal 0xb4, @cpu.a
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -748,10 +748,10 @@ class TestI8080 < Test::Unit::TestCase
     test "RLC without overflow and carry" do
       @cpu.mem[0] = 0b00_010_111
       @cpu.a = 0x5a
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0xb5, @cpu.a
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -761,7 +761,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xa5
       @cpu.run 1
       assert_equal 0x4a, @cpu.a
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -769,10 +769,10 @@ class TestI8080 < Test::Unit::TestCase
     test "RLC with overflow and carry" do
       @cpu.mem[0] = 0b00_010_111
       @cpu.a = 0xa5
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x4b, @cpu.a
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -786,7 +786,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x5a
       @cpu.run 1
       assert_equal 0x2d, @cpu.a
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -794,10 +794,10 @@ class TestI8080 < Test::Unit::TestCase
     test "RAR without borrow and carry" do
       @cpu.mem[0] = 0b00_011_111
       @cpu.a = 0x5a
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0xad, @cpu.a
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -807,7 +807,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xa5
       @cpu.run 1
       assert_equal 0x52, @cpu.a
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -815,10 +815,10 @@ class TestI8080 < Test::Unit::TestCase
     test "RAR with overflow and carry" do
       @cpu.mem[0] = 0b00_011_111
       @cpu.a = 0xa5
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0xd2, @cpu.a
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 1, @cpu.pc
       assert_equal 4, @cpu.clock
     end
@@ -853,7 +853,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b11_011_010
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x1234, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -876,7 +876,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b11_010_010
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 3, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -1053,7 +1053,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0xfffe] = 0x34
       @cpu.mem[0xffff] = 0x12
       @cpu.sp = 0xfffe
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x1234, @cpu.pc
       assert_equal 11, @cpu.clock
@@ -1078,7 +1078,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0xfffe] = 0x34
       @cpu.mem[0xffff] = 0x12
       @cpu.sp = 0x0000
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x0001, @cpu.pc
       assert_equal 5, @cpu.clock
@@ -1243,7 +1243,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.hl = 0x4321
       @cpu.mem[0] = 0b00_001_001
       @cpu.run 1
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 0x5555, @cpu.hl
       assert_equal 1, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -1254,7 +1254,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.hl = 0x8000
       @cpu.mem[0] = 0b00_001_001
       @cpu.run 1
-      assert_equal true, @cpu.flg_c?
+      assert_equal true, @cpu.flg_cy?
       assert_equal 0x0000, @cpu.hl
       assert_equal 1, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -1265,7 +1265,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.hl = 0x4321
       @cpu.mem[0] = 0b00_011_001
       @cpu.run 1
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 0x5555, @cpu.hl
       assert_equal 1, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -1275,7 +1275,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.hl = 0x1234
       @cpu.mem[0] = 0b00_101_001
       @cpu.run 1
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 0x2468, @cpu.hl
       assert_equal 1, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -1286,7 +1286,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.hl = 0x4321
       @cpu.mem[0] = 0b00_111_001
       @cpu.run 1
-      assert_equal false, @cpu.flg_c?
+      assert_equal false, @cpu.flg_cy?
       assert_equal 0x5555, @cpu.hl
       assert_equal 1, @cpu.pc
       assert_equal 10, @cpu.clock
@@ -1386,5 +1386,56 @@ class TestI8080 < Test::Unit::TestCase
     end
 
   end
+
+  sub_test_case 'DAA' do
+      
+      test 'DAA(0x5 + 0x5)' do
+        @cpu.a = 0x05
+        @cpu.flg_ac = true
+        @cpu.mem[0] = 0b10_000_111
+        @cpu.mem[1] = 0b00_100_111
+        @cpu.run 2
+        assert_equal 0x10, @cpu.a
+        assert_equal 2, @cpu.pc
+        assert_equal 8, @cpu.clock
+      end
+  
+    end
+
+    sub_test_case 'DAA' do
+      
+      test 'DAA(0x05 + 0x05)' do
+        @cpu.a = 0x05
+        @cpu.mem[0] = 0b10_000_111
+        @cpu.mem[1] = 0b00_100_111
+        @cpu.run 2
+        assert_equal 0x10, @cpu.a
+        assert_equal 2, @cpu.pc
+        assert_equal 8, @cpu.clock
+      end
+  
+      test 'DAA(0x50 + 0x50)' do
+        @cpu.a = 0x50
+        @cpu.mem[0] = 0b10_000_111
+        @cpu.mem[1] = 0b00_100_111
+        @cpu.run 2
+        assert_equal 0x00, @cpu.a
+        assert_equal 2, @cpu.pc
+        assert_equal 8, @cpu.clock
+      end
+  
+      test 'DAA(0x0f + 0x01)' do
+        @cpu.a = 0x0f
+        @cpu.b = 0x01
+        @cpu.mem[0] = 0b10_000_000
+        @cpu.mem[1] = 0b00_100_111
+        @cpu.run 1
+        @cpu.run 1
+        assert_equal 0x16, @cpu.a
+        assert_equal 2, @cpu.pc
+        assert_equal 8, @cpu.clock
+      end
+  
+    end
 
 end

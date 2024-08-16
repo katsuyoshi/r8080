@@ -39,7 +39,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b11_011_100
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x1234, @cpu.pc
       assert_equal 0xfffe, @cpu.sp
@@ -68,7 +68,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b11_010_100
       @cpu.mem[1] = 0x34
       @cpu.mem[2] = 0x12
-      @cpu.flg_c = true
+      @cpu.flg_cy = true
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x0000, @cpu.sp
