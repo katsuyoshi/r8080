@@ -243,6 +243,8 @@ class I8080
       cmc
     when 0b00_100_111
       daa
+    when 0b00_100_010
+      shld_i
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -649,6 +651,15 @@ class I8080
       @a = @mem[de]
     end
     @clock += 7
+  end
+
+  def shld_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    @mem[h << 8 | l] = @l
+    @mem[(h << 8 | l) + 1] = @h
+    @clock += 16
   end
 
   def xchg

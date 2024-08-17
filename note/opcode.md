@@ -78,7 +78,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 00 110 111  STC              4     4   set carry
 - [x] 00 111 111  CMC              4     4   complement carry
 - [x] 00 100 111  DAA              4     4   decimal adjust A
-- [ ] 00 100 010  SHLD  addr      16    16   store H & L direct
+- [x] 00 100 010  SHLD  addr      16    16   store H & L direct
 - [ ] 00 101 010  LHLD  addr      16    16   store H & L direct
 - [ ] 11 111 011  EI               4     4   enable interrupts
 - [ ] 11 110 011  DI               4     4   disable interrupt
