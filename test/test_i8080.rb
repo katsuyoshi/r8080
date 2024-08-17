@@ -95,4 +95,32 @@ class TestI8080 < Test::Unit::TestCase
     assert_equal 7, @cpu.clock
   end
 
+  test "EI" do
+    @cpu.mem[0] = 0b11_111_011
+    @cpu.mem[1] = 0b00_000_000
+    @cpu.run 1
+    assert_equal false, @cpu.interrupt_enabled?
+    assert_equal 1, @cpu.pc
+    assert_equal 4, @cpu.clock
+    @cpu.run 1
+    assert_equal true, @cpu.interrupt_enabled?
+    assert_equal 2, @cpu.pc
+    assert_equal 8, @cpu.clock
+  end
+
+  test "DI" do
+    @cpu.mem[0] = 0b11_111_011
+    @cpu.mem[1] = 0b00_000_000
+    @cpu.mem[2] = 0b11_110_011
+    @cpu.run 2
+    assert_equal true, @cpu.interrupt_enabled?
+    assert_equal 2, @cpu.pc
+    assert_equal 8, @cpu.clock
+    @cpu.run 1
+    assert_equal false, @cpu.interrupt_enabled?
+    assert_equal 3, @cpu.pc
+    assert_equal 12, @cpu.clock
+  end
+
+
 end

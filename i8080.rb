@@ -2,6 +2,7 @@
 class I8080
 
   attr_accessor :a, :f, :b, :c, :d, :e, :h, :l, :pc, :sp
+  attr_accessor :interrupt_enable, :interrupt_pending
   attr_accessor :clock
   attr_reader :mem, :model
 
@@ -30,6 +31,8 @@ class I8080
   def initialize options={}
     @mem = [0] * 64 * 1024
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
+    @interrupt_enable = false
+    @interrupt_pending = nil
     @clock = 0
   end
 
@@ -128,6 +131,11 @@ class I8080
     end
   end
 
+  def interrupt_enabled?
+    @interrupt_enable
+  end
+
+
 
   private
 
@@ -147,6 +155,8 @@ class I8080
   # --- execute
 
   def execute
+
+    @interrupt_pending += 1 if @interrupt_pending
 
     case @mem[@pc]
     when 0b00_000_000
@@ -249,6 +259,10 @@ class I8080
       shld_i
     when 0b00_101_010
       lhld_i
+    when 0b11_111_011
+      ei
+    when 0b11_110_011
+      di
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -297,6 +311,12 @@ class I8080
       rst
 
     end
+
+    if @interrupt_pending && @interrupt_pending >= 1
+      @interrupt_enable = true
+      @interrupt_pending = nil
+    end
+
 
   end
 
@@ -863,7 +883,20 @@ class I8080
     @pc += 1
     @clock += 4
   end
-  
+
+  def ei
+    @pc += 1
+    @interrupt_pending = 0
+    @clock += 4
+  end
+
+  def di
+    @pc += 1
+    @interrupt_enable = false
+    @interrupt_pending = nil
+    @clock += 4
+  end
+
   def hlt
     @clock += 7
   end
