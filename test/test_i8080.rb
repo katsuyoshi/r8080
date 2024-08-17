@@ -81,6 +81,12 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  test "NOP" do
+    @cpu.mem[0] = 0b00_000_000
+    @cpu.run 1
+    assert_equal 1, @cpu.pc
+    assert_equal 4, @cpu.clock
+  end
 
   test "HLT" do
     @cpu.mem[0] = 0b01_110_110

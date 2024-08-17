@@ -149,6 +149,8 @@ class I8080
   def execute
 
     case @mem[@pc]
+    when 0b00_000_000
+      nop
     when 0b01_110_110
       hlt
     when 0b11_000_110
@@ -857,6 +859,11 @@ class I8080
     @clock += 4
   end
 
+  def nop
+    @pc += 1
+    @clock += 4
+  end
+  
   def hlt
     @clock += 7
   end
