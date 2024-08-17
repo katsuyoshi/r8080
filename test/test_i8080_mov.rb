@@ -376,4 +376,21 @@ class TestI8080 < Test::Unit::TestCase
   
   end
 
+  sub_test_case "LHLD   imm" do
+      
+    test "LHLD 8000" do
+      @cpu.mem[0] = 0b00_101_010
+      @cpu.mem[1] = 0x00
+      @cpu.mem[2] = 0x80
+      @cpu.mem[0x8000] = 0x34
+      @cpu.mem[0x8001] = 0x12
+      @cpu.run 1
+      assert_equal 0x12, @cpu.h
+      assert_equal 0x34, @cpu.l
+      assert_equal 3, @cpu.pc
+      assert_equal 16, @cpu.clock
+    end
+
+  end
+
 end

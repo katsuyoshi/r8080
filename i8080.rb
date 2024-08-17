@@ -245,6 +245,8 @@ class I8080
       daa
     when 0b00_100_010
       shld_i
+    when 0b00_101_010
+      lhld_i
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -657,8 +659,19 @@ class I8080
     @pc += 1
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
-    @mem[h << 8 | l] = @l
-    @mem[(h << 8 | l) + 1] = @h
+    adr = h << 8 | l
+    @mem[adr] = @l
+    @mem[adr + 1] = @h
+    @clock += 16
+  end
+
+  def lhld_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    adr = h << 8 | l
+    @l = @mem[adr]
+    @h = @mem[adr + 1]
     @clock += 16
   end
 
