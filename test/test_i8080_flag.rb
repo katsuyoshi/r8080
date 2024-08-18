@@ -24,13 +24,14 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
     end
 
-    test "INR A (0xff + 0x01) -> z ac cy" do
+    test "INR A (0xff + 0x01) -> z ac" do
       @cpu.a = 0xff
       @cpu.mem[0] = 0b00_111_100
       @cpu.run 1
-      assert_equal 0b01_0_1_0_1_1_1, @cpu.f
+      assert_equal 0b01_0_1_0_1_1_0, @cpu.f
     end
 
+    # cy is not affected by INR
     test "DCR A from 1 (0x01 - 0x01) -> z p" do
       @cpu.a = 0x01
       @cpu.mem[0] = 0b00_111_101
@@ -38,11 +39,12 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0b01_0_0_0_1_1_0, @cpu.f
     end
 
-    test "DCR A from 0 (0x01 - 0x1) -> z ac p cy" do
+    # cy is not affected by DCR
+    test "DCR A from 0 (0x01 - 0x1) -> z ac p" do
       @cpu.a = 0x00
       @cpu.mem[0] = 0b00_111_101
       @cpu.run 1
-      assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
+      assert_equal 0b1_0_0_1_0_1_1_0, @cpu.f
     end
 
   end
@@ -139,6 +141,39 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 7, @cpu.clock
     end
 
+  end
+
+  sub_test_case "INR   r" do
+    
+    # carray is not affected by INR
+    test "INR A (case zero) -> z ac p" do
+      @cpu.mem[0] = 0b00_111_100
+      @cpu.a = 0xff
+      @cpu.run 1
+      assert_equal 0b0_1_0_1_0_1_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+    # carray is not affected by INR
+    test "INR A (case minus) -> s ac" do
+      @cpu.mem[0] = 0b00_111_100
+      @cpu.a = 0x7f
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_0_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
+    test "INR A (case not ac) -> none" do
+      @cpu.mem[0] = 0b00_111_100
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+  
   end
   
 

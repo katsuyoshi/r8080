@@ -25,7 +25,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 11 100 110  ANI   imm        7     7   and immediate with A
 - [x] 11 101 110  XRI   imm        7     7   exclusive or immediate with A
 - [x] 11 110 110  ORI   imm        7     7   or immedeate with A
-- [ ] 11 111 110  CPI   imm        7     7   compare immediate with A
+- [x] 11 111 110  CPI   imm        7     7   compare immediate with A
 - [x] 00 000 111  RLC              4     4   rotate A left
 - [x] 00 001 111  RRC              4     4   rotate A right
 - [x] 00 010 111  RAL              4     4   rotate A left through carry
