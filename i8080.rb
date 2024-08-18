@@ -280,6 +280,8 @@ class I8080
       in_i
     when 0b11_010_011
       out_i
+    when 0b11_111_110
+      cpi_i
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -426,6 +428,16 @@ class I8080
     else
       @clock += 4
     end
+  end
+
+  def cpi_i
+    @pc += 1
+    l = @mem[@pc]; @pc += 1
+    h = @mem[@pc]; @pc += 1
+    i = @mem[h << 8 | l]
+    a = read_r(REG_A)
+    write_r REG_NONE, a - i, (a & 0xf) - (i & 0xf), true
+    @clock += 7
   end
   
 
