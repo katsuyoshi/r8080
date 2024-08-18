@@ -27,6 +27,17 @@ class I8080
   FLG_P  = 0x04
   FLG_CY = 0x01
 
+  # You should override this class to implement IO. And set it to io_delegate.
+  class IoDelegate
+    attr_accessor :values
+    def initialize
+      @values = {}
+    end
+    def in port; values[port] || 0; end
+    def out port, data; values[port] = data end
+  end
+
+  attr_accessor :io_delegate
 
   def initialize options={}
     @mem = [0] * 64 * 1024
@@ -34,6 +45,7 @@ class I8080
     @interrupt_enable = false
     @interrupt_pending = nil
     @clock = 0
+    @io_delegate = IoDelegate.new
   end
 
   def run cycle=-1
@@ -263,6 +275,10 @@ class I8080
       ei
     when 0b11_110_011
       di
+    when 0b11_011_011
+      in_i
+    when 0b11_010_011
+      out_i
 
     when lambda{|v| (v & 0b11_001_111) == 0b00_000_001}
       lxi_r_i
@@ -877,6 +893,20 @@ class I8080
     @pc += 1
     self.flg_cy = !self.flg_cy?
     @clock += 4
+  end
+
+  def in_i
+    @pc += 1
+    port = @mem[@pc]; @pc += 1
+    @a = @io_delegate.in port if @io_delegate
+    @clock += 10
+  end
+  
+  def out_i
+    @pc += 1
+    port = @mem[@pc]; @pc += 1
+    @io_delegate.out port, @a if @io_delegate
+    @clock += 10
   end
 
   def nop
