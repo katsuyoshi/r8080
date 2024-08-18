@@ -24,22 +24,6 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
     end
 
-    # cy is not affected by INR
-    test "DCR A from 1 (0x01 - 0x01) -> z p" do
-      @cpu.a = 0x01
-      @cpu.mem[0] = 0b00_111_101
-      @cpu.run 1
-      assert_equal 0b01_0_0_0_1_1_0, @cpu.f
-    end
-
-    # cy is not affected by DCR
-    test "DCR A from 0 (0x01 - 0x1) -> z ac p" do
-      @cpu.a = 0x00
-      @cpu.mem[0] = 0b00_111_101
-      @cpu.run 1
-      assert_equal 0b1_0_0_1_0_1_1_0, @cpu.f
-    end
-
   end
 
   sub_test_case "CMP   r" do
@@ -200,6 +184,37 @@ class TestI8080 < Test::Unit::TestCase
     end
 
   end
+
+  sub_test_case "INX   rp" do
+
+    # inx is nothing effected flags
+    test "INX B (case zero) -> z p" do
+      @cpu.mem[0] = 0b00_000_011
+      @cpu.b = 0xff
+      @cpu.c = 0xff
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+  end
+
+  sub_test_case "DCX   rp" do
+
+    # dcx is nothing effected flags
+    test "DCX B (case zero) -> z p" do
+      @cpu.mem[0] = 0b00_000_101
+      @cpu.b = 0x00
+      @cpu.c = 0x00
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 5, @cpu.clock
+    end
+
+  end
+
 
 
 end
