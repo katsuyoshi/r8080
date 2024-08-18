@@ -17,7 +17,7 @@ http://www.st.rim.or.jp/~nkomatsu/intel8bit/i8080.html
 - [x] 10 100 sss  ANA   rm        4/7   4/7  and with A
 - [x] 10 101 sss  XRA   rm        4/7   4/7  exclusive or with A
 - [x] 10 110 sss  ORA   rm        4/7   4/7  or with A
-- [ ] 10 111 sss  CMP   rm        4/7   4/7  compare with A
+- [x] 10 111 sss  CMP   rm        4/7   4/7  compare with A
 - [x] 11 000 110  ADI   imm        7     7   add immediate to A
 - [x] 11 001 110  ACI   imm        7     7   add immediate to A with carry
 - [x] 11 010 110  SUI   imm        7     7   subtract immediate from A

@@ -45,8 +45,51 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
     end
 
+  end
+
+  sub_test_case "CMP   r" do
+
+    test "CMP A (case zero) -> z p" do
+      @cpu.mem[0] = 0b10_111_111
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "CMP B (case minus) -> s p" do
+      @cpu.mem[0] = 0b10_111_000
+      @cpu.a = 0xff
+      @cpu.b = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "CMP B (case carry) -> s p ac cy" do
+      @cpu.mem[0] = 0b10_111_000
+      @cpu.a = 0x00
+      @cpu.b = 0x01
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "CMP M (case parity off) -> s p ac cy" do
+      @cpu.mem[0] = 0b10_111_110
+      @cpu.a = 0x01
+      @cpu.h = 0x80; @cpu.l = 0
+      @cpu.mem[0x8000] = 0x00
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
 
   end
+  
 
 
 end

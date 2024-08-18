@@ -6,6 +6,7 @@ class I8080
   attr_accessor :clock
   attr_reader :mem, :model
 
+  REG_NONE = -1
   REG_A = 7
   REG_B = 0
   REG_C = 1
@@ -293,14 +294,15 @@ class I8080
     when lambda{|v| (v & 0b11_001_111) == 0b00_001_011}
       dcx_rp
 
-    when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
-      mov_r_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_110}
       mvi_r_i
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_100}
       inr_r
     when lambda{|v| (v & 0b11_000_111) == 0b00_000_101}
       dcr_r
+    when lambda{|v| (v & 0b11_000_111) == 0b11_000_111}
+      rst
+
     when lambda{|v| (v & 0b11_111_000) == 0b10_000_000}
       add_r
     when lambda{|v| (v & 0b11_111_000) == 0b10_001_000}
@@ -323,9 +325,12 @@ class I8080
       xri_i
     when lambda{|v| (v & 0b11_111_000) == 0b11_110_000}
       ori_i
-    when lambda{|v| (v & 0b11_000_111) == 0b11_000_111}
-      rst
+    when lambda{|v| (v & 0b11_111_000) == 0b10_111_000}
+      cmp_r
 
+    when lambda{|v| (v & 0b11_000_000) == 0b01_000_000}
+      mov_r_r
+    
     end
 
     if @interrupt_pending && @interrupt_pending >= 1
@@ -409,6 +414,20 @@ class I8080
       @clock += 4
     end
   end
+
+  def cmp_r
+    v = @mem[@pc]; @pc += 1
+    s = src_r v
+    a = read_r(REG_A)
+    b = read_r(s)
+    write_r REG_NONE, a - b, (a & 0xf) - (b & 0xf), true
+    if reg_m? s
+      @clock += 7
+    else
+      @clock += 4
+    end
+  end
+  
 
   def sui_i
     @pc += 1
@@ -901,7 +920,7 @@ class I8080
     @a = @io_delegate.in port if @io_delegate
     @clock += 10
   end
-  
+
   def out_i
     @pc += 1
     port = @mem[@pc]; @pc += 1
@@ -958,7 +977,7 @@ class I8080
   def write_r r, v, hv, set_f = false
     v8 = v & 0xff
     case r
-    when REG_A
+    when REG_A, REG_NONE
       if set_f
         self.flg_s = (v8 & FLG_S) == FLG_S
         self.flg_z = (v8 == 0)
@@ -975,7 +994,7 @@ class I8080
         self.flg_ac = (hv & 0xf0) != 0
       end
 
-      @a = v8
+      @a = v8 if r == REG_A
     when REG_B
       @b = v8
     when REG_C
