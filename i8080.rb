@@ -559,7 +559,7 @@ class I8080
   def ana_r
     v = @mem[@pc]; @pc += 1
     s = src_r v
-    write_r REG_A, read_r(REG_A) & read_r(s), 0x10, FLGS_ALL
+    write_r REG_A, read_r(REG_A) & read_r(s), 0, FLGS_ALL
     if reg_m? s
       @clock += 7
     else
@@ -570,7 +570,7 @@ class I8080
   def ani_i
     @pc += 1
     i = @mem[@pc]; @pc += 1
-    write_r REG_A, read_r(REG_A) & i, 0x10, FLGS_ALL
+    write_r REG_A, read_r(REG_A) & i, 0, FLGS_ALL
     @clock += 7
   end
 
