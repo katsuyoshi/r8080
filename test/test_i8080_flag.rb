@@ -311,4 +311,70 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "ORA   r" do
+
+    test "ORA A (case zero) -> z p" do
+      @cpu.mem[0] = 0b10_110_111
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ORA A (case minus) -> s p" do
+      @cpu.mem[0] = 0b10_110_111
+      @cpu.a = 0xff
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+
+    test "ORA A (case no parity) -> s p" do
+      @cpu.mem[0] = 0b10_110_111
+      @cpu.a = 0x01
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+      assert_equal 1, @cpu.pc
+      assert_equal 4, @cpu.clock
+    end
+  
+  end
+
+  sub_test_case "ORI   i" do
+
+    test "ORI 0x00 (case zero) -> z p" do
+      @cpu.mem[0] = 0b11_110_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "ORI 0xff (case minus) -> s p" do
+      @cpu.mem[0] = 0b11_110_110
+      @cpu.mem[1] = 0xff
+      @cpu.a = 0xff
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+    test "ORI 0x01 (case no parity) -> s p" do
+      @cpu.mem[0] = 0b11_110_110
+      @cpu.mem[1] = 0x01
+      @cpu.a = 0x01
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+      assert_equal 2, @cpu.pc
+      assert_equal 7, @cpu.clock
+    end
+
+  end
+
+
 end
