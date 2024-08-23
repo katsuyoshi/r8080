@@ -104,6 +104,261 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "ADD   r" do
+
+    test "ADD A (case zero) -> z p cy" do
+      @cpu.mem[0] = 0b10_000_111
+      @cpu.a = 0x80
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_1, @cpu.f
+    end
+
+    test "ADD B (case minus) -> s ac" do
+      @cpu.mem[0] = 0b10_000_000
+      @cpu.a = 0x80
+      @cpu.b = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
+    end
+    
+  end
+
+  sub_test_case "ADC   r" do
+
+    test "ADC A (case zero) -> z p cy" do
+      @cpu.mem[0] = 0b10_001_111
+      @cpu.a = 0x80
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_1, @cpu.f
+    end
+
+    test "ADC B (case minus) -> s ac" do
+      @cpu.mem[0] = 0b10_001_000
+      @cpu.a = 0x80
+      @cpu.b = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
+    end
+
+    test "ADC B with carry (case zero) -> z ac p cy" do
+      @cpu.mem[0] = 0b10_001_000
+      @cpu.a = 0xff
+      @cpu.b = 0x00
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b0_1_0_1_0_1_1_1, @cpu.f
+    end
+
+    test "ADC B with carry (case minus) -> s" do
+      @cpu.mem[0] = 0b10_001_000
+      @cpu.a = 0x82
+      @cpu.b = 0x00
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
+    end
+
+  end
+
+  sub_test_case "ADI   i" do
+
+    test "ADI 0x00 (case zero) -> z p cy" do
+      @cpu.mem[0] = 0b11_000_110
+      @cpu.mem[1] = 0x80
+      @cpu.a = 0x80
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_1, @cpu.f
+    end
+
+    test "ADI 0x00 (case minus) -> s ac" do
+      @cpu.mem[0] = 0b11_000_110
+      @cpu.mem[1] = 0x80
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
+    end
+
+  end
+
+  sub_test_case "ACI   i" do
+
+
+    test "ACI 0x00 (case zero) -> z p cy" do
+      @cpu.mem[0] = 0b11_001_110
+      @cpu.mem[1] = 0x80
+      @cpu.a = 0x80
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_1, @cpu.f
+    end
+
+    test "ACI 0x00 (case minus) -> s ac" do
+      @cpu.mem[0] = 0b11_001_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x80
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
+    end
+
+    test "ACI 0x00 with carry (case zero) -> z ac p cy" do
+      @cpu.mem[0] = 0b11_001_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0xff
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b0_1_0_1_0_1_1_1, @cpu.f
+    end
+
+  end
+
+  sub_test_case "SUB   r" do
+
+    test "SUB A (case zero) -> z p" do
+      @cpu.mem[0] = 0b10_010_111
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    test "SUB B (case minus) -> s p" do
+      @cpu.mem[0] = 0b10_010_000
+      @cpu.a = 0xff
+      @cpu.b = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
+    end
+
+  end
+
+  sub_test_case "SBB   r" do
+
+    test "SBB A (case zero) -> z p" do
+      @cpu.mem[0] = 0b10_011_111
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    test "SBB B (case minus) -> s ac p cy" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.a = 0x00
+      @cpu.b = 0x01
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
+    end
+
+    test "SBB B (case parity off) -> none" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.a = 0x02
+      @cpu.b = 0x01
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+    end
+
+    test "SBB B with carry (case zero) -> z p" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.a = 0x01
+      @cpu.b = 0x00
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    test "SBB B with carry (case minus) -> s ac p cy" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.a = 0x00
+      @cpu.b = 0x00
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
+    end
+
+    test "SBB B with carry (case parity off) -> none" do
+      @cpu.mem[0] = 0b10_011_000
+      @cpu.a = 0x02
+      @cpu.b = 0x00
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+    end
+
+  end
+
+  sub_test_case "SUI   i" do
+
+    test "SUI 0x00 (case zero) -> z p" do
+      @cpu.mem[0] = 0b11_010_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    test "SUI 0x00 (case minus) -> s ac" do
+      @cpu.mem[0] = 0b11_010_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x80
+      @cpu.run 1
+      assert_equal 0b1_0_0_0_0_0_1_0, @cpu.f
+    end
+
+  end
+
+  sub_test_case "SBI   i" do
+
+    test "SBI 0x00 (case zero) -> z p" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    test "SBI 0x00 (case minus) -> s ac p cy" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x01
+      @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
+    end
+
+    test "SBI 0x00 (case parity off) -> none" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x01
+      @cpu.a = 0x02
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+    end
+
+    test "SBI 0x00 with carry (case zero) -> z p" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x01
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    test "SBI 0x00 with carry (case minus) -> s ac p cy" do
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x00
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
+    end
+
+    test "SBI 0x00 with carry (case parity off) -> none" do 
+      @cpu.mem[0] = 0b11_011_110
+      @cpu.mem[1] = 0x00
+      @cpu.a = 0x02
+      @cpu.flg_cy = 1
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+    end
+
+
+  end
+
+
   sub_test_case "INR   r" do
     
     # carray is not affected by INR
