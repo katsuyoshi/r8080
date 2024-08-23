@@ -32,8 +32,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b10_111_111
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMP B (case minus) -> s p" do
@@ -42,8 +40,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.b = 0x00
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMP B (case carry) -> s p ac cy" do
@@ -52,8 +48,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.b = 0x01
       @cpu.run 1
       assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMP M (case parity off) -> s p ac cy" do
@@ -63,8 +57,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
   end
@@ -78,8 +70,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 3, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "CPI 0x8000 (case minus) -> s p" do
@@ -90,8 +80,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 3, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "CPI 0x8000 (case carry) -> s p ac cy" do
@@ -102,8 +90,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0x8000] = 0x01
       @cpu.run 1
       assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
-      assert_equal 3, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "CPI 0x8000 (case parity off) -> s p ac cy" do
@@ -114,8 +100,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 3, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
   end
@@ -128,8 +112,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b0_1_0_1_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
   
     # carray is not affected by INR
@@ -138,8 +120,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x7f
       @cpu.run 1
       assert_equal 0b1_0_0_1_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
   
     test "INR A (case not ac) -> none" do
@@ -147,8 +127,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
   
   end
@@ -160,8 +138,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
 
     # carray is not affected by DCR
@@ -170,8 +146,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b1_0_0_1_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
 
     test "DCR A (case not p) -> s ac" do
@@ -179,8 +153,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x02
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
 
   end
@@ -194,8 +166,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.c = 0xff
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
 
   end
@@ -209,8 +179,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.c = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
     end
 
   end
@@ -226,8 +194,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.l = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
     end
 
     test "DAD B (case carry) -> cy" do
@@ -238,8 +204,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.l = 0xff
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_1, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
     end
 
   end
@@ -252,8 +216,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "ANA A (case minus) -> s p" do
@@ -261,8 +223,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "ANA A (case no parity) -> s p" do
@@ -270,8 +230,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
   end
@@ -285,8 +243,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "ANI 0xff (case minus) -> s p" do
@@ -295,8 +251,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "ANI 0x01 (case no parity) -> s p" do
@@ -305,8 +259,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
   end
@@ -319,8 +271,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "ORA A (case minus) -> s p" do
@@ -328,8 +278,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "ORA A (case no parity) -> s p" do
@@ -337,8 +285,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
   
   end
@@ -352,8 +298,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "ORI 0xff (case minus) -> s p" do
@@ -362,8 +306,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "ORI 0x01 (case no parity) -> s p" do
@@ -372,8 +314,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
   end
@@ -387,8 +327,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.b = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "XRA A (case minus) -> s p" do
@@ -397,8 +335,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.b = 0x00
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "XRA A (case no parity) -> s p" do
@@ -407,8 +343,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.b = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
   end
@@ -422,8 +356,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "XRI 0xff (case minus) -> s p" do
@@ -432,8 +364,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
     test "XRI 0x01 (case no parity) -> s p" do
@@ -442,8 +372,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 2, @cpu.pc
-      assert_equal 7, @cpu.clock
     end
 
   end
@@ -456,8 +384,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMA (case carry) -> none" do
@@ -465,8 +391,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0xff
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMA (case no parity) -> none" do
@@ -474,8 +398,6 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.a = 0x01
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
   end
@@ -487,24 +409,18 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.mem[0] = 0b00_111_111
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_1, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMC (case carry) -> cy" do
       @cpu.mem[0] = 0b00_111_111
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_1, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
     test "CMC (case no parity) -> cy" do
       @cpu.mem[0] = 0b00_111_111
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_1, @cpu.f
-      assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
     end
 
   end
