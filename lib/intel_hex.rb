@@ -55,17 +55,3 @@ class IntelHex
   end
 
 end
-
-
-if __FILE__ == $0
-  data = (0...0x100).to_a
-  hex = IntelHex.new "test.hex", data
-  hex.save(0 => 0x100)
-  hex.load
-  if hex.data == data
-    puts "OK"
-  else
-    puts "NG"
-  end
-  #p data, hex.data
-end
