@@ -456,7 +456,7 @@ class TestI8080 < Test::Unit::TestCase
 
     # dcx is nothing effected flags
     test "DCX B (case zero) -> z p" do
-      @cpu.mem[0] = 0b00_000_101
+      @cpu.mem[0] = 0b00_001_011
       @cpu.b = 0x00
       @cpu.c = 0x00
       @cpu.run 1
