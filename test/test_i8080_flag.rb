@@ -359,7 +359,7 @@ class TestI8080 < Test::Unit::TestCase
   end
 
 
-  sub_test_case "INR   r" do
+  sub_test_case "INR   A" do
     
     # carray is not affected by INR
     test "INR A (case zero) -> z ac p" do
@@ -380,6 +380,33 @@ class TestI8080 < Test::Unit::TestCase
     test "INR A (case not ac) -> none" do
       @cpu.mem[0] = 0b00_111_100
       @cpu.a = 0x00
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
+    end
+  
+  end
+  
+  sub_test_case "INR   B" do
+    
+    # carray is not affected by INR
+    test "INR B (case zero) -> z ac p" do
+      @cpu.mem[0] = 0b00_000_100
+      @cpu.b = 0xff
+      @cpu.run 1
+      assert_equal 0b0_1_0_1_0_1_1_0, @cpu.f
+    end
+  
+    # carray is not affected by INR
+    test "INR B (case minus) -> s ac" do
+      @cpu.mem[0] = 0b00_000_100
+      @cpu.b = 0x7f
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_0_1_0, @cpu.f
+    end
+  
+    test "INR B (case not ac) -> none" do
+      @cpu.mem[0] = 0b00_000_100
+      @cpu.b = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
     end

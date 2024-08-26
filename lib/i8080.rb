@@ -992,22 +992,23 @@ class I8080
 
   def write_r r, v, hv, set_f = FLGS_NONE
     v8 = v & 0xff
-    case r
+
+    self.flg_s = (v8 & FLG_S) == FLG_S  if set_f & FLG_S != 0
+    self.flg_z = (v8 == 0)              if set_f & FLG_Z != 0
+    self.flg_cy = (v & 0xff00) != 0     if set_f & FLG_CY != 0
+            
+    # odd parity
+    bits = v8
+    bits = (bits & 0x55) + (bits >> 1 & 0x55);
+    bits = (bits & 0x33) + (bits >> 2 & 0x33);
+    bits = (bits & 0x0f) + (bits >> 4 & 0x0f);
+    self.flg_p = (bits & 0x01) == 0     if set_f & FLG_P != 0
+
+    # ac
+    self.flg_ac = (hv & 0xf0) != 0      if set_f & FLG_AC != 0
+
+  case r
     when REG_A, REG_NONE
-      self.flg_s = (v8 & FLG_S) == FLG_S  if set_f & FLG_S != 0
-      self.flg_z = (v8 == 0)              if set_f & FLG_Z != 0
-      self.flg_cy = (v & 0xff00) != 0     if set_f & FLG_CY != 0
-              
-      # odd parity
-      bits = v8
-      bits = (bits & 0x55) + (bits >> 1 & 0x55);
-      bits = (bits & 0x33) + (bits >> 2 & 0x33);
-      bits = (bits & 0x0f) + (bits >> 4 & 0x0f);
-      self.flg_p = (bits & 0x01) == 0     if set_f & FLG_P != 0
-
-      # ac
-      self.flg_ac = (hv & 0xf0) != 0      if set_f & FLG_AC != 0
-
       @a = v8 if r == REG_A
     when REG_B
       @b = v8
