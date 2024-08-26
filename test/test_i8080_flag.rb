@@ -413,7 +413,7 @@ class TestI8080 < Test::Unit::TestCase
   
   end
   
-  sub_test_case "DCR   r" do
+  sub_test_case "DCR   A" do
 
     test "DCR A (case zero) -> z p" do
       @cpu.mem[0] = 0b00_111_101
@@ -433,6 +433,32 @@ class TestI8080 < Test::Unit::TestCase
     test "DCR A (case not p) -> s ac" do
       @cpu.mem[0] = 0b00_111_101
       @cpu.a = 0x02
+      @cpu.run 1
+      assert_equal 0b0_0_0_0_0_1_0, @cpu.f
+    end
+
+  end
+
+  sub_test_case "DCR   B" do
+
+    test "DCR B (case zero) -> z p" do
+      @cpu.mem[0] = 0b00_000_101
+      @cpu.b = 0x01
+      @cpu.run 1
+      assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
+    end
+
+    # carray is not affected by DCR
+    test "DCR B (case minus) -> s ac p" do
+      @cpu.mem[0] = 0b00_000_101
+      @cpu.b = 0x00
+      @cpu.run 1
+      assert_equal 0b1_0_0_1_0_1_1_0, @cpu.f
+    end
+
+    test "DCR B (case not p) -> s ac" do
+      @cpu.mem[0] = 0b00_000_101
+      @cpu.b = 0x02
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_1_0, @cpu.f
     end
