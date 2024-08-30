@@ -3,7 +3,7 @@ class I8080
 
   attr_accessor :a, :f, :b, :c, :d, :e, :h, :l, :pc, :sp
   attr_accessor :interrupt_enable, :interrupt_pending
-  attr_accessor :state
+  attr_accessor :state, :clock
   attr_reader :mem, :model
 
   REG_NONE = -1
@@ -49,17 +49,26 @@ class I8080
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
     @interrupt_enable = false
     @interrupt_pending = nil
+    @clock = 1000000
     @state = 0
     @io_delegate = IoDelegate.new
   end
 
   def run cycle=-1
+    s_t = Time.now
+    s_st = @state
     loop do
 
       execute
-      #dump_regs
 
       cycle -= 1 if cycle > 0
+
+      # adjust clock time
+      t = Time.now
+      st = @state
+      d = (st - s_st) / @clock - (t - s_t)
+      sleep d if d > 0
+
       break if cycle == 0
     end
   end
