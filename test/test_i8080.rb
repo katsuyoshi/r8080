@@ -20,7 +20,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x24, @cpu.a
       assert_equal 1, @cpu.pc
-      assert_equal 4, @cpu.clock
+      assert_equal 4, @cpu.state
     end
 
     test "ADD M" do
@@ -28,7 +28,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x35, @cpu.a
       assert_equal 1, @cpu.pc
-      assert_equal 7, @cpu.clock
+      assert_equal 7, @cpu.state
     end
 
   end
@@ -44,7 +44,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0xff, @cpu.a
       assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
+      assert_equal 5, @cpu.state
     end
 
     test "DCR M" do
@@ -52,7 +52,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0xff, @cpu.mem[0x8000]
       assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
+      assert_equal 10, @cpu.state
     end
 
   end
@@ -68,7 +68,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 1, @cpu.a
       assert_equal 1, @cpu.pc
-      assert_equal 5, @cpu.clock
+      assert_equal 5, @cpu.state
     end
 
     test "INR M" do
@@ -76,7 +76,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 1, @cpu.mem[0x8000]
       assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
+      assert_equal 10, @cpu.state
     end
 
   end
@@ -85,14 +85,14 @@ class TestI8080 < Test::Unit::TestCase
     @cpu.mem[0] = 0b00_000_000
     @cpu.run 1
     assert_equal 1, @cpu.pc
-    assert_equal 4, @cpu.clock
+    assert_equal 4, @cpu.state
   end
 
   test "HLT" do
     @cpu.mem[0] = 0b01_110_110
     @cpu.run 1
     assert_equal 0, @cpu.pc
-    assert_equal 7, @cpu.clock
+    assert_equal 7, @cpu.state
   end
 
   test "EI" do
@@ -101,11 +101,11 @@ class TestI8080 < Test::Unit::TestCase
     @cpu.run 1
     assert_equal false, @cpu.interrupt_enabled?
     assert_equal 1, @cpu.pc
-    assert_equal 4, @cpu.clock
+    assert_equal 4, @cpu.state
     @cpu.run 1
     assert_equal true, @cpu.interrupt_enabled?
     assert_equal 2, @cpu.pc
-    assert_equal 8, @cpu.clock
+    assert_equal 8, @cpu.state
   end
 
   test "DI" do
@@ -115,11 +115,11 @@ class TestI8080 < Test::Unit::TestCase
     @cpu.run 2
     assert_equal true, @cpu.interrupt_enabled?
     assert_equal 2, @cpu.pc
-    assert_equal 8, @cpu.clock
+    assert_equal 8, @cpu.state
     @cpu.run 1
     assert_equal false, @cpu.interrupt_enabled?
     assert_equal 3, @cpu.pc
-    assert_equal 12, @cpu.clock
+    assert_equal 12, @cpu.state
   end
 
   test "OUT" do
@@ -129,7 +129,7 @@ class TestI8080 < Test::Unit::TestCase
     @cpu.run 1
     assert_equal 0x12, @cpu.io_delegate.in(0)
     assert_equal 2, @cpu.pc
-    assert_equal 10, @cpu.clock
+    assert_equal 10, @cpu.state
   end
 
   test "IN" do
@@ -141,7 +141,7 @@ class TestI8080 < Test::Unit::TestCase
     @cpu.run 2
     assert_equal 0x12, @cpu.a
     assert_equal 4, @cpu.pc
-    assert_equal 20, @cpu.clock
+    assert_equal 20, @cpu.state
   end
 
 

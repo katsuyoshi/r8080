@@ -18,7 +18,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
   end
@@ -32,7 +32,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "cc 0x1234 with carry" do
@@ -45,7 +45,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
   end
@@ -61,7 +61,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
     test "cnc 0x1234 with carry" do
@@ -72,7 +72,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x0000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
   end
@@ -86,7 +86,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x0000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "cz 0x1234 with zero" do
@@ -99,7 +99,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
   end
@@ -115,7 +115,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
     test "cnz 0x1234 with zero" do
@@ -126,7 +126,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
   end
@@ -142,7 +142,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
     test "cp 0x1234 with sign" do
@@ -153,7 +153,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
   end
@@ -167,7 +167,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "cm 0x1234 without sign" do
@@ -180,7 +180,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
   end
@@ -194,7 +194,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "cpe 0x1234 without sign" do
@@ -207,7 +207,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
   end
@@ -223,7 +223,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x03, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 17, @cpu.clock
+      assert_equal 17, @cpu.state
     end
 
     test "cpo 0x1234 with sign" do
@@ -234,7 +234,7 @@ class TestI8080 < Test::Unit::TestCase
       @cpu.run 1
       assert_equal 0x0003, @cpu.pc
       assert_equal 0x000, @cpu.sp
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
   end
@@ -248,7 +248,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x01, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
 
@@ -259,7 +259,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x01, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "rst 7" do
@@ -269,7 +269,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0xfffe, @cpu.sp
       assert_equal 0x01, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x00, @cpu.mem[@cpu.sp + 1]
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
   end

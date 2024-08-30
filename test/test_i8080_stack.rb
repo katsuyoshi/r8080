@@ -30,7 +30,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x33, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x22, @cpu.mem[@cpu.sp + 1]
       assert_equal 1, @cpu.pc
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "PUSH D" do
@@ -40,7 +40,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x55, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x44, @cpu.mem[@cpu.sp + 1]
       assert_equal 1, @cpu.pc
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "PUSH H" do
@@ -50,7 +50,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x77, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x66, @cpu.mem[@cpu.sp + 1]
       assert_equal 1, @cpu.pc
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
     test "PUSH PSW" do
@@ -60,7 +60,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x02, @cpu.mem[@cpu.sp + 0]
       assert_equal 0x11, @cpu.mem[@cpu.sp + 1]
       assert_equal 1, @cpu.pc
-      assert_equal 11, @cpu.clock
+      assert_equal 11, @cpu.state
     end
 
   end
@@ -75,7 +75,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x33, @cpu.c
       assert_equal 0x22, @cpu.b
       assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
+      assert_equal 10, @cpu.state
     end
 
     test "POP D" do
@@ -86,7 +86,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x55, @cpu.e
       assert_equal 0x44, @cpu.d
       assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
+      assert_equal 10, @cpu.state
     end
 
     test "POP H" do
@@ -97,7 +97,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x77, @cpu.l
       assert_equal 0x66, @cpu.h
       assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
+      assert_equal 10, @cpu.state
     end
 
     test "POP PSW" do
@@ -108,7 +108,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x02, @cpu.f
       assert_equal 0x11, @cpu.a
       assert_equal 1, @cpu.pc
-      assert_equal 10, @cpu.clock
+      assert_equal 10, @cpu.state
     end
 
   end
@@ -125,7 +125,7 @@ class TestI8080 < Test::Unit::TestCase
       assert_equal 0x33, @cpu.mem[0xfffe]
       assert_equal 0x22, @cpu.mem[0xffff]
       assert_equal 1, @cpu.pc
-      assert_equal 18, @cpu.clock
+      assert_equal 18, @cpu.state
     end
 
   end
@@ -139,7 +139,7 @@ class TestI8080 < Test::Unit::TestCase
         @cpu.run 1
         assert_equal 0x2233, @cpu.sp
         assert_equal 1, @cpu.pc
-        assert_equal 5, @cpu.clock
+        assert_equal 5, @cpu.state
       end
   
     end 

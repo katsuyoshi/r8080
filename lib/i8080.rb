@@ -3,7 +3,7 @@ class I8080
 
   attr_accessor :a, :f, :b, :c, :d, :e, :h, :l, :pc, :sp
   attr_accessor :interrupt_enable, :interrupt_pending
-  attr_accessor :clock
+  attr_accessor :state
   attr_reader :mem, :model
 
   REG_NONE = -1
@@ -49,7 +49,7 @@ class I8080
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
     @interrupt_enable = false
     @interrupt_pending = nil
-    @clock = 0
+    @state = 0
     @io_delegate = IoDelegate.new
   end
 
@@ -76,9 +76,9 @@ class I8080
 
   # --- dump register
 
-  def dump_regs
+  def dump_regs rollback=false
     puts
-    print "\n\e[2A"
+    print "\n\e[2A" if rollback
     %w(A F B C D E H L).zip([a, f, b, c, d, e, h, l]).each do |n, v|
       print "#{n}:#{v.to_s(16).rjust(2, '0')} "
     end
@@ -86,6 +86,7 @@ class I8080
     %w(BC DE HL PC SP).zip([bc, de, hl, pc, sp]).each do |n, v|
       print "#{n}:#{v.to_s(16).rjust(4, '0')} "
     end
+    puts unless rollback
   end
 
   def flg_s?
@@ -357,9 +358,9 @@ class I8080
     b = read_r(s)
     write_r REG_A, a + b, (a & 0xf) + (b & 0xf), FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -371,9 +372,9 @@ class I8080
     b = read_r(s)
     write_r REG_A, a + b + c, (a & 0xf) + (b & 0xf) + c, FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -382,7 +383,7 @@ class I8080
     i = @mem[@pc]; @pc += 1
     a = read_r(REG_A)
     write_r REG_A, a + i, (a & 0xf) + (i & 0xf), FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def aci_i
@@ -391,7 +392,7 @@ class I8080
     c = flg_cy? ? 1 : 0
     a = read_r(REG_A)
     write_r REG_A, a + i + c, (a & 0xf) + (i & 0xf) + c, FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def sub_r
@@ -401,9 +402,9 @@ class I8080
     b = read_r(s)
     write_r REG_A, a - b, (a & 0xf) - (b & 0xf), FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -415,9 +416,9 @@ class I8080
     b = read_r(s)
     write_r REG_A, a - b - c, (a & 0xf) - (b & 0xf) - c, FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -428,9 +429,9 @@ class I8080
     b = read_r(s)
     write_r REG_NONE, a - b, (a & 0xf) - (b & 0xf), FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -441,7 +442,7 @@ class I8080
     i = @mem[h << 8 | l]
     a = read_r(REG_A)
     write_r REG_NONE, a - i, (a & 0xf) - (i & 0xf), FLGS_ALL
-    @clock += 7
+    @state += 7
   end
   
 
@@ -450,7 +451,7 @@ class I8080
     i = @mem[@pc]; @pc += 1
     a = read_r(REG_A)
     write_r REG_A, a - i, (a & 0xf) - (i & 0xf), FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def sbi_i
@@ -459,7 +460,7 @@ class I8080
     c = flg_cy? ? 1 : 0
     a = read_r(REG_A)
     write_r REG_A, a - i - c, (a & 0xf) - (i & 0xf) - c, FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def dad_rp
@@ -477,7 +478,7 @@ class I8080
     end
     self.flg_cy = (self.hl & 0xffff0000) != 0
     self.hl &= 0xffff
-    @clock += 10
+    @state += 10
   end
 
   def daa
@@ -491,7 +492,7 @@ class I8080
       self.flg_cy = true
     end
     write_r REG_A, v, 0, FLGS_ALL
-    @clock += 4
+    @state += 4
   end
 
   def dcr_r
@@ -500,9 +501,9 @@ class I8080
     a = read_r(d)
     write_r d, a - 1, (a & 0xf) - 1, FLGS_S_Z_AC_P
     if reg_m? d
-      @clock += 10
+      @state += 10
     else
-      @clock += 5
+      @state += 5
     end
   end
 
@@ -512,9 +513,9 @@ class I8080
     a = read_r(d)
     write_r d, a + 1, (a & 0xf) + 1, FLGS_S_Z_AC_P
     if reg_m? d
-      @clock += 10
+      @state += 10
     else
-      @clock += 5
+      @state += 5
     end
   end
 
@@ -531,7 +532,7 @@ class I8080
     when REG_PAIR_SP
       @sp += 1
     end
-    @clock += 5
+    @state += 5
   end
 
   def dcx_rp
@@ -547,13 +548,13 @@ class I8080
     when REG_PAIR_SP
       @sp -= 1
     end
-    @clock += 5
+    @state += 5
   end
 
   def cma
     @pc += 1
     @a = ~@a & 0xff
-    @clock += 4
+    @state += 4
   end
 
   def ana_r
@@ -561,9 +562,9 @@ class I8080
     s = src_r v
     write_r REG_A, read_r(REG_A) & read_r(s), 0, FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -571,7 +572,7 @@ class I8080
     @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) & i, 0, FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def xra_r
@@ -579,9 +580,9 @@ class I8080
     s = src_r v
     write_r REG_A, read_r(REG_A) ^ read_r(s), 0, FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -589,7 +590,7 @@ class I8080
     @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) ^ i, 0, FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def ora_r
@@ -597,9 +598,9 @@ class I8080
     s = src_r v
     write_r REG_A, read_r(REG_A) | read_r(s), 0, FLGS_ALL
     if reg_m? s
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -607,7 +608,7 @@ class I8080
     @pc += 1
     i = @mem[@pc]; @pc += 1
     write_r REG_A, read_r(REG_A) | i, 0, FLGS_ALL
-    @clock += 7
+    @state += 7
   end
 
   def rlc
@@ -616,7 +617,7 @@ class I8080
     c = v & 0x100 != 0 ? 1 : 0
     v = v | c
     write_r REG_A, v, 0, FLGS_ALL
-    @clock += 4
+    @state += 4
   end
 
   def ral
@@ -625,7 +626,7 @@ class I8080
     v = read_r(REG_A) << 1
     v = v | c
     write_r REG_A, v, 0, FLGS_ALL
-    @clock += 4
+    @state += 4
   end
 
   def rrc
@@ -634,7 +635,7 @@ class I8080
     c = v & 0x01 != 0 ? 0x180 : 0
     v = (v >> 1) | c
     write_r REG_A, v, 0, FLGS_ALL
-    @clock += 4
+    @state += 4
   end
 
   def rar
@@ -643,7 +644,7 @@ class I8080
     c = (flg_cy? ? 0x80 : 0) | (v & 0x01 != 0 ? 0x100 : 0)
     v = (v >> 1) | c
     write_r REG_A, v, 0, FLGS_ALL
-    @clock += 4
+    @state += 4
   end
 
   def mvi_r_i
@@ -652,9 +653,9 @@ class I8080
     d = dst_r v
     write_r d, i, 0
     if reg_m? d
-      @clock += 10
+      @state += 10
     else
-      @clock += 7
+      @state += 7
     end
   end
 
@@ -664,9 +665,9 @@ class I8080
     s = src_r v
     write_r d, read_r(s), 0
     if reg_m?(d) || reg_m?(s)
-      @clock += 7
+      @state += 7
     else
-      @clock += 4
+      @state += 4
     end
   end
 
@@ -685,7 +686,7 @@ class I8080
     when REG_PAIR_SP
       @sp = h << 8 | l
     end
-    @clock += 10
+    @state += 10
   end
 
   def sta_i
@@ -693,7 +694,7 @@ class I8080
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
     @mem[h << 8 | l] = @a
-    @clock += 13
+    @state += 13
   end
 
   def lda_i
@@ -701,7 +702,7 @@ class I8080
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
     @a = @mem[h << 8 | l]
-    @clock += 13
+    @state += 13
   end
 
   def stax_rp
@@ -713,7 +714,7 @@ class I8080
     when REG_PAIR_DE
       @mem[de] = @a
     end
-    @clock += 7
+    @state += 7
   end
 
   def ldax_rp
@@ -725,7 +726,7 @@ class I8080
     when REG_PAIR_DE
       @a = @mem[de]
     end
-    @clock += 7
+    @state += 7
   end
 
   def shld_i
@@ -735,7 +736,7 @@ class I8080
     adr = h << 8 | l
     @mem[adr] = @l
     @mem[adr + 1] = @h
-    @clock += 16
+    @state += 16
   end
 
   def lhld_i
@@ -745,7 +746,7 @@ class I8080
     adr = h << 8 | l
     @l = @mem[adr]
     @h = @mem[adr + 1]
-    @clock += 16
+    @state += 16
   end
 
   def xchg
@@ -753,7 +754,7 @@ class I8080
     t = self.de
     self.de = self.hl
     self.hl = t
-    @clock += 4
+    @state += 4
   end
 
   def xthl
@@ -761,19 +762,19 @@ class I8080
     t = pop_i16
     push_i16 self.hl
     self.hl = t
-    @clock += 18
+    @state += 18
   end
 
   def sphl
     @pc += 1
     @sp = self.hl
-    @clock += 5
+    @state += 5
   end
 
   def pchl
     @pc += 1
     @pc = self.hl
-    @clock += 5
+    @state += 5
   end
 
   def jmp_i
@@ -781,7 +782,7 @@ class I8080
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
     @pc = h << 8 | l
-    @clock += 10
+    @state += 10
   end
 
   def jmp_cond cond
@@ -789,7 +790,7 @@ class I8080
     l = @mem[@pc]; @pc += 1
     h = @mem[@pc]; @pc += 1
     @pc = h << 8 | l if cond
-    @clock += 10
+    @state += 10
   end
 
   def jc_i ; jmp_cond flg_cy? ; end
@@ -807,7 +808,7 @@ class I8080
     h = @mem[@pc]; @pc += 1
     push_i16 @pc
     @pc = h << 8 | l
-    @clock += 17
+    @state += 17
   end
 
   def call_cond cond
@@ -817,9 +818,9 @@ class I8080
     if cond
       push_i16 @pc
       @pc = h << 8 | l
-      @clock += 17
+      @state += 17
     else
-      @clock += 11
+      @state += 11
     end
   end
 
@@ -834,16 +835,16 @@ class I8080
 
   def ret
     @pc = pop_i16
-    @clock += 10
+    @state += 10
   end
 
   def ret_cond cond
     if cond
       @pc = pop_i16
-      @clock += 11
+      @state += 11
     else
       @pc += 1
-      @clock += 5
+      @state += 5
     end
   end
 
@@ -861,7 +862,7 @@ class I8080
     push_i16 @pc
     v = ((v >> 3) & 0x07) << 3
     @pc = v
-    @clock += 11
+    @state += 11
   end
 
   def push_rp
@@ -877,7 +878,7 @@ class I8080
     when REG_PAIR_PSW
       push_i16 psw
     end
-    @clock += 11
+    @state += 11
   end
 
   def pop_rp
@@ -893,7 +894,7 @@ class I8080
     when REG_PAIR_PSW
       self.psw = pop_i16
     end
-    @clock += 10
+    @state += 10
   end
 
   def push_i8 i8
@@ -921,49 +922,49 @@ class I8080
   def stc
     @pc += 1
     self.flg_cy = true
-    @clock += 4
+    @state += 4
   end
 
   def cmc
     @pc += 1
     self.flg_cy = !self.flg_cy?
-    @clock += 4
+    @state += 4
   end
 
   def in_i
     @pc += 1
     port = @mem[@pc]; @pc += 1
     @a = @io_delegate.in port if @io_delegate
-    @clock += 10
+    @state += 10
   end
 
   def out_i
     @pc += 1
     port = @mem[@pc]; @pc += 1
     @io_delegate.out port, @a if @io_delegate
-    @clock += 10
+    @state += 10
   end
 
   def nop
     @pc += 1
-    @clock += 4
+    @state += 4
   end
 
   def ei
     @pc += 1
     @interrupt_pending = 0
-    @clock += 4
+    @state += 4
   end
 
   def di
     @pc += 1
     @interrupt_enable = false
     @interrupt_pending = nil
-    @clock += 4
+    @state += 4
   end
 
   def hlt
-    @clock += 7
+    @state += 7
   end
 
 
