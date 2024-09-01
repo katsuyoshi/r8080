@@ -6,6 +6,8 @@ class I8080
   attr_accessor :state, :clock
   attr_reader :mem, :model
 
+  attr_accessor :io_delegate
+
   REG_NONE = -1
   REG_A = 7
   REG_B = 0
@@ -42,16 +44,32 @@ class I8080
     def out port, data; values[port] = data end
   end
 
-  attr_accessor :io_delegate
+  class MemoryManager
+    def initialize
+      @mem = [0] * 64 * 1024
+    end
+    def inspect; puts self; end
+    def [] addr; @mem[addr]; end
+    def []= addr, v; @mem[addr] = v; end
+  end
 
-  def initialize options={}
-    @mem = [0] * 64 * 1024
+  def initialize options={ memory_manager: nil, io_delegate: nil }
+    @mem = options[:memory_manager] || MemoryManager.new
+    @io_delegate = options[:memory_manager] || IoDelegate.new
+
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
     @interrupt_enable = false
     @interrupt_pending = nil
     @clock = 1000000
     @state = 0
-    @io_delegate = IoDelegate.new
+  end
+
+  def memory_manager
+    @mem
+  end
+
+  def memory_manager= m
+    @mem = m
   end
 
   def run cycle=-1
@@ -1040,4 +1058,8 @@ class I8080
 
 end
 
-I8080.new.run if $0 == __FILE__
+if $0 == __FILE__
+  cpu = I8080.new
+  cpu.mem[0] = 0b01_110_110
+  p cpu.mem[0].to_s(2).rjust(8, '0')
+end
