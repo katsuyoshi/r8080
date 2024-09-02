@@ -1,0 +1,43 @@
+; I use asm80-node to assemble this file.
+; @see https://github.com/asm80/asm80-node
+    
+    ORG 0x0000
+        
+    NOP
+    XRA A
+
+SET_SEG:
+    LXI     H, 83f8h
+    MVI     B, 8
+
+SET_SEG_1:
+    MOV     M, A
+    INX     H
+    DCR     B
+    JNZ     SET_SEG_1
+    INR     A
+    CALL    WAIT
+    JMP     SET_SEG
+
+
+    ORG 0x0020
+    ; 11 + 7 + 256 * (5 + 10) + 10 + 10 = 3878
+WAIT:
+    PUSH    PSW             ; 11
+    PUSH    B
+
+    MVI     B, 00
+WAIT_1:
+    MVI     A, 00           ; 7
+WAIT_2:
+    DCR     A               ; 5
+    JNZ     WAIT_2          ; 10
+    DCR     B
+    JNZ     WAIT_1          ; 10
+
+    POP     B               ; 10
+    POP     PSW             ; 10
+    RET
+
+
+    END

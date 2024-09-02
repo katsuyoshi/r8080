@@ -5,6 +5,7 @@ class I8080
   attr_accessor :interrupt_enable, :interrupt_pending
   attr_accessor :state, :clock
   attr_reader :mem, :model
+  attr_reader :sync_queue
 
   attr_accessor :io_delegate
 
@@ -45,15 +46,20 @@ class I8080
   end
 
   class MemoryManager
-    def initialize
-      @mem = [0] * 64 * 1024
+    attr_accessor :mem
+    def initialize options={}
+      @mem = [0] * (options[:size] || 64 * 1024)
     end
     def inspect; puts self; end
-    def [] addr; @mem[addr]; end
-    def []= addr, v; @mem[addr] = v; end
+    def method_missing m, *args
+      case m
+      when :[], :[]=
+        @mem.send m, *args
+      end
+    end
   end
 
-  def initialize options={ memory_manager: nil, io_delegate: nil }
+  def initialize options={}
     @mem = options[:memory_manager] || MemoryManager.new
     @io_delegate = options[:memory_manager] || IoDelegate.new
 
@@ -62,6 +68,8 @@ class I8080
     @interrupt_pending = nil
     @clock = 1000000
     @state = 0
+    @sync_queue = Queue.new
+    @sync_queue.push nil
   end
 
   def memory_manager
@@ -77,7 +85,12 @@ class I8080
     s_st = @state
     loop do
 
-      execute
+      begin
+        @sync_queue.pop
+        execute
+      ensure
+        @sync_queue.push nil
+      end
 
       cycle -= 1 if cycle > 0
 
@@ -179,6 +192,23 @@ class I8080
   def interrupt_enabled?
     @interrupt_enable
   end
+
+  def hold
+    begin
+      @sync_queue.pop
+      yield
+    ensure
+      @sync_queue.push nil
+    end
+  end
+
+  def interrupt
+    return unless interrupt_enabled?
+    @sync_queue.pop
+    rst 7
+    @sync_queue.push nil
+  end
+
 
 
 
@@ -884,8 +914,13 @@ class I8080
   def rpe; ret_cond flg_p? ; end
   def rpo; ret_cond !flg_p?; end
 
-  def rst
-    v = @mem[@pc]; @pc += 1
+  # If execcute it in interrupt, call it with vector no.
+  def rst vect = nil
+    if vect
+      v = b011_000_111 | (vect << 3)
+    else
+      v = @mem[@pc]; @pc += 1
+    end
     push_i16 @pc
     v = ((v >> 3) & 0x07) << 3
     @pc = v

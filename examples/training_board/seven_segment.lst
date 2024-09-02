@@ -1,0 +1,45 @@
+0000                             ; I use asm80-node to assemble this file.
+0000                             ; @see https://github.com/asm80/asm80-node
+0000                          .ORG   0x0000   
+0000   00                     NOP      
+0001   AF                     XRA   A   
+0002                SET_SEG:      
+0002   21 F8 83               LXI   H,83f8h   
+0005   06 08                  MVI   B,8   
+0007                SET_SEG_1:      
+0007   77                     MOV   M,A   
+0008   23                     INX   H   
+0009   05                     DCR   B   
+000A   C2 07 00               JNZ   SET_SEG_1   
+000D   3C                     INR   A   
+000E   CD 20 00               CALL   WAIT   
+0011   C3 02 00               JMP   SET_SEG   
+0020                          .ORG   0x0020   
+0020                             ; 11 + 7 + 256 * (5 + 10) + 10 + 10 = 3878
+0020                WAIT:        
+0020   F5                     PUSH   PSW   ; 11
+0021   C5                     PUSH   B   
+0022   06 00                  MVI   B,00   
+0024                WAIT_1:      
+0024   3E 00                  MVI   A,00   ; 7
+0026                WAIT_2:      
+0026   3D                     DCR   A   ; 5
+0027   C2 26 00               JNZ   WAIT_2   ; 10
+002A   05                     DCR   B   
+002B   C2 24 00               JNZ   WAIT_1   ; 10
+002E   C1                     POP   B   ; 10
+002F   F1                     POP   PSW   ; 10
+0030   C9                     RET      
+0031                          END      
+
+
+SET_SEG:            0002 DEFINED AT LINE 9
+                    > USED AT LINE 20
+SET_SEG_1:          0007 DEFINED AT LINE 13
+                    > USED AT LINE 17
+WAIT:               0020 DEFINED AT LINE 25
+                    > USED AT LINE 19
+WAIT_1:             0024 DEFINED AT LINE 30
+                    > USED AT LINE 36
+WAIT_2:             0026 DEFINED AT LINE 32
+                    > USED AT LINE 34
