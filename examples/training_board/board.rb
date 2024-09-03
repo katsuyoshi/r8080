@@ -115,19 +115,20 @@ t1 = Thread.new do
 end
 
 t2 = Thread.new do
-  #i = 0
+  delimiter = "\r"
+  i = 0
   loop do
     cpu.hold {
       s = Time.now
       puts
-      8.times do |i|
+      #8.times do |i|
         seg[i] = cpu.mem[0x83f8 + i]
-      end
-      seg.puts
-      cpu.dump_regs
+      #end
+      seg.puts delimiter
+      cpu.dump_regs delimiter
       print "\e[7A"
       print "%.6f" % (Time.now - s)
-      #i = (i + 1) % 8
+      i = (i + 1) % 8
     }
     sleep 0.01
   end
