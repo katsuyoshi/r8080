@@ -28,6 +28,9 @@ class IntelHex
         end
       end
     end
+    @data.each_with_index do |x, i|
+      @data[i] = 0 unless x
+    end
   end
 
   def save(ranges = {})
