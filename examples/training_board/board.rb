@@ -18,21 +18,23 @@ class MemoryManager < I8080::MemoryManager
   end
 
   def [](*args)
+    #return super
     case args.size
     when 1
-      a_or_r = args[0] & 0x83ff
-      case a_or_r
+      case args[0]
       when Range
-        a_or_r.map do |i|
-          if @rom.include?(i) || @ram.include?(i)
-            @mem[i]
+        args[0].map do |i|
+          a = i & 0x83ff
+          if @rom.include?(a) || @ram.include?(a)
+            @mem[a]
           else
             0
           end
         end
       else
-        if @rom.include?(a_or_r) || @ram.include?(a_or_r)
-          @mem[a_or_r]
+        a = args[0] & 0x83ff
+        if @rom.include?(a) || @ram.include?(a)
+          @mem[a]
         else
           0
         end
@@ -52,29 +54,30 @@ class MemoryManager < I8080::MemoryManager
   def []=(*args)
     case args.size
     when 2
-      a_or_r = args[0] & 0x83ff
       v = args[1]
-      case a_or_r
+      case args[0]
       when Range
-        a_or_r.each do |i|
-          if @rom.include?(i) || @ram.include?(i)
-            @mem[i] = v[i]
+        args[0].each_with_index do |a, i|
+          adr = a & 0x83ff
+          if @rom.include?(adr) || @ram.include?(adr)
+            @mem[adr] = v[i]
           end
         end
       else
-        if @rom.include?(a_or_r) || @ram.include?(a_or_r)
-          @mem[a_or_r] = v
+        adr = args[0] & 0x83ff
+        if @rom.include?(adr) || @ram.include?(adr)
+          @mem[adr] = v
         else
           0
         end
       end
 
     when 3
-      addr = args[0]
+      adr = args[0]
       size = args[1]
       v = args[2]
       size.times do |i|
-        @mem[(addr + i) & 0x83ff] = v[i]
+        @mem[(adr + i) & 0x83ff] = v[i]
       end
     end
   end
@@ -87,7 +90,7 @@ hex = IntelHex.new(hex_file)
 hex.load
 data = hex.data
 
-cpu = I8080.new #memory_manager: MemoryManager.new
+cpu = I8080.new memory_manager: MemoryManager.new
 cpu.mem[0, data.size] = data
 seg = SevenSegmentDisplay.new
 
