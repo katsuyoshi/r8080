@@ -15,6 +15,7 @@ class MemoryManager < I8080::MemoryManager
     @rom = 0..0x3ff
     # ram 1kbyte
     @ram = 0x8000..0x83ff
+    @force = false
   end
 
   def [](*args)
@@ -59,13 +60,13 @@ class MemoryManager < I8080::MemoryManager
       when Range
         args[0].each_with_index do |a, i|
           adr = a & 0x83ff
-          if @rom.include?(adr) || @ram.include?(adr)
+          if @force || @ram.include?(adr)
             @mem[adr] = v[i]
           end
         end
       else
         adr = args[0] & 0x83ff
-        if @rom.include?(adr) || @ram.include?(adr)
+        if @force || @ram.include?(adr)
           @mem[adr] = v
         else
           0
@@ -77,8 +78,21 @@ class MemoryManager < I8080::MemoryManager
       size = args[1]
       v = args[2]
       size.times do |i|
-        @mem[(adr + i) & 0x83ff] = v[i]
+        if @force || @ram.include?(adr)
+          @mem[(adr + i) & 0x83ff] = v[i]
+        end
       end
+    end
+  end
+
+  # Usually, the ROM memory is read-only.
+  # This method enables to force write to the ROM memory.
+  def force_write
+    begin
+      @force = true
+      yield
+    ensure
+      @force = false
     end
   end
 
@@ -91,7 +105,9 @@ hex.load
 data = hex.data
 
 cpu = I8080.new memory_manager: MemoryManager.new
-cpu.mem[0, data.size] = data
+cpu.mem.force_write {
+  cpu.mem[0, data.size] = data
+}
 seg = SevenSegmentDisplay.new
 
 t1 = Thread.new do
