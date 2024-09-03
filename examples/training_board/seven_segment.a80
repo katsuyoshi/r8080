@@ -1,10 +1,13 @@
 ; I use asm80-node to assemble this file.
 ; @see https://github.com/asm80/asm80-node
     
+USESP: EQU   83C7H
+
     ORG 0x0000
         
     NOP
     XRA A
+    LXI     SP, USESP
 
 SET_SEG:
     LXI     H, 83f8h

@@ -1,19 +1,21 @@
 0000                             ; I use asm80-node to assemble this file.
 0000                             ; @see https://github.com/asm80/asm80-node
+0000                USESP:    EQU   83C7H   
 0000                          .ORG   0x0000   
 0000   00                     NOP      
 0001   AF                     XRA   A   
-0002                SET_SEG:      
-0002   21 F8 83               LXI   H,83f8h   
-0005   06 08                  MVI   B,8   
-0007                SET_SEG_1:      
-0007   77                     MOV   M,A   
-0008   23                     INX   H   
-0009   05                     DCR   B   
-000A   C2 07 00               JNZ   SET_SEG_1   
-000D   3C                     INR   A   
-000E   CD 20 00               CALL   WAIT   
-0011   C3 02 00               JMP   SET_SEG   
+0002   31 C7 83               LXI   SP,USESP   
+0005                SET_SEG:      
+0005   21 F8 83               LXI   H,83f8h   
+0008   06 08                  MVI   B,8   
+000A                SET_SEG_1:      
+000A   77                     MOV   M,A   
+000B   23                     INX   H   
+000C   05                     DCR   B   
+000D   C2 0A 00               JNZ   SET_SEG_1   
+0010   3C                     INR   A   
+0011   CD 20 00               CALL   WAIT   
+0014   C3 05 00               JMP   SET_SEG   
 0020                          .ORG   0x0020   
 0020                             ; 11 + 7 + 256 * (5 + 10) + 10 + 10 = 3878
 0020                WAIT:        
@@ -33,13 +35,15 @@
 0031                          END      
 
 
-SET_SEG:            0002 DEFINED AT LINE 9
+USESP:              83C7 DEFINED AT LINE 4
+                    > USED AT LINE 10
+SET_SEG:            0005 DEFINED AT LINE 12
+                    > USED AT LINE 23
+SET_SEG_1:          000A DEFINED AT LINE 16
                     > USED AT LINE 20
-SET_SEG_1:          0007 DEFINED AT LINE 13
-                    > USED AT LINE 17
-WAIT:               0020 DEFINED AT LINE 25
-                    > USED AT LINE 19
-WAIT_1:             0024 DEFINED AT LINE 30
-                    > USED AT LINE 36
-WAIT_2:             0026 DEFINED AT LINE 32
-                    > USED AT LINE 34
+WAIT:               0020 DEFINED AT LINE 28
+                    > USED AT LINE 22
+WAIT_1:             0024 DEFINED AT LINE 33
+                    > USED AT LINE 39
+WAIT_2:             0026 DEFINED AT LINE 35
+                    > USED AT LINE 37
