@@ -3,9 +3,8 @@ require "rake/testtask"
 
 task default:  'run:board'
 
-desc "Assemble board.a80"
-file 'seven_segment.hex' => 'seven_segment.a80' do
-  sh 'asm80 seven_segment.a80'
+rule ".hex" => ".a80" do |t|
+  sh "asm80 #{t.source}"
 end
 
 namespace :run do
