@@ -116,17 +116,17 @@ class I8080
 
   # --- dump register
 
-  def dump_regs rollback=false
-    puts
-    print "\n\e[2A" if rollback
+  def dump_regs delimiter="", rollback=false
+    puts delimiter
+    print delimiter + "\n\e[2A" if rollback
     %w(A F B C D E H L).zip([a, f, b, c, d, e, h, l]).each do |n, v|
       print "#{n}:#{v.to_s(16).rjust(2, '0')} "
     end
-    print "\n"
+    print delimiter + "\n"
     %w(BC DE HL PC SP).zip([bc, de, hl, pc, sp]).each do |n, v|
       print "#{n}:#{v.to_s(16).rjust(4, '0')} "
     end
-    puts unless rollback
+    puts delimiter unless rollback
   end
 
   def flg_s?

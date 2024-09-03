@@ -25,9 +25,9 @@ class SevenSegment
     @buf[2][3] = val[7] == 0 ? ' ' : '.'
   end
 
-  def puts
+  def puts delimiter = ""
     @buf.each do |row|
-      Kernel.puts row.join
+      Kernel.puts row.join + delimiter
     end
   end
 
@@ -43,13 +43,14 @@ class SevenSegmentDisplay
     @segs[i].seg = val
   end
 
-  def puts
+  def puts delimiter = ""
+    print delimiter
     3.times do |i|
       s = ''
       @segs.each do |seg|
         s << seg.buf[i].join
       end
-      Kernel.puts s
+      Kernel.puts s + delimiter
     end
   end
 

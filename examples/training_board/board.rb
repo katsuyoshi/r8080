@@ -4,6 +4,8 @@ $LOAD_PATH.unshift File.expand_path('../', __FILE__)
 require 'i8080'
 require 'intel_hex'
 require 'seven_segment'
+require 'io/console'
+
 
 hex_file = ARGV[0] || 'seven_segment.hex'
 
@@ -131,6 +133,13 @@ t2 = Thread.new do
       i = (i + 1) % 8
     }
     sleep 0.01
+  end
+end
+
+while true
+  case $stdin.getch
+  when ?\C-c
+    exit
   end
 end
 
