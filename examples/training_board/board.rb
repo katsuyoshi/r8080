@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path('../../../lib', __FILE__)
 $LOAD_PATH.unshift File.expand_path('../', __FILE__)
 
 require 'i8080'
+require 'ppi'
 require 'intel_hex'
 require 'seven_segment'
 require 'io/console'
@@ -106,7 +107,7 @@ hex = IntelHex.new(hex_file)
 hex.load
 data = hex.data
 
-cpu = I8080.new memory_manager: MemoryManager.new
+cpu = I8080.new memory_manager: MemoryManager.new, io_delegate: PPI.new
 cpu.mem.force_write {
   cpu.mem[0, data.size] = data
 }

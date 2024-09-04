@@ -43,6 +43,7 @@ class I8080
     end
     def in port; values[port] || 0; end
     def out port, data; values[port] = data end
+    def reset; end
   end
 
   class MemoryManager
