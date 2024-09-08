@@ -119,28 +119,34 @@ end
 
 t2 = Thread.new do
   delimiter = "\r"
-  i = 0
+  #i = 0
   loop do
     cpu.hold {
       s = Time.now
       puts
-      #8.times do |i|
+      8.times do |i|
         seg[i] = cpu.mem[0x83f8 + i]
-      #end
+      end
       seg.puts delimiter
       cpu.dump_regs delimiter
       print "\e[7A"
-      print "%.6f" % (Time.now - s)
-      i = (i + 1) % 8
+      #print "%.6f" % (Time.now - s)
+      #i = (i + 1) % 8
     }
-    sleep 0.01
+    sleep 0.03
   end
 end
 
+# NOTE: ↑: 0x44, ↓: 0x42, →: 0x43, ←: 0x41, ESC: 0x1b
 while true
-  case $stdin.getch
+  c = $stdin.getch
+  case c
   when ?\C-c
     exit
+  when nil
+  else
+    cpu.io_delegate.press c.upcase
+    sleep 0.03
   end
 end
 

@@ -188,4 +188,57 @@ class TestI8080 < Test::Unit::TestCase
 
   end
 
+  sub_test_case "key define" do
+
+    test "KEY_0" do
+      assert_equal 0x30, PPI::KEY_0
+    end
+
+    test "KEY_9" do
+      assert_equal 0x39, PPI::KEY_9
+    end
+
+    test "KEY_A" do
+      assert_equal 0x41, PPI::KEY_A
+    end
+
+    test "KEY_F" do
+      assert_equal 0x46, PPI::KEY_F
+    end
+
+    test "KEY_RUN" do
+      assert_equal 0x52, PPI::KEY_RUN
+    end
+
+    test "KEY_RET" do
+      assert_equal 0x0d, PPI::KEY_RET
+    end
+
+    test "KEY_ADRS_SET" do
+      assert_equal 0x20, PPI::KEY_ADRS_SET
+    end
+
+    test "KEY_READ_DEC" do
+      assert_equal 44, PPI::KEY_READ_DEC
+    end
+
+    test "KEY_READ_INC" do
+      assert_equal 46, PPI::KEY_READ_INC
+    end
+
+    test "KEY_WRITE_INC" do
+      assert_equal 47, PPI::KEY_WRITE_INC
+    end
+
+    test "KEY_DATA_STORE" do
+      assert_equal 0x53, PPI::KEY_STORE_DATA
+    end
+
+    test "KEY_DATA_LOAD" do
+      assert_equal 0x4c, PPI::KEY_LOAD_DATA
+    end
+
+
+  end
+
 end

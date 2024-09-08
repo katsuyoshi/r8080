@@ -12,6 +12,11 @@ namespace :run do
   task :board => 'seven_segment.hex' do
     sh 'ruby board.rb'
   end
+
+  desc "Run TK-80"
+  task :tk80 => 'tk80_mon.hex' do
+    sh 'ruby board.rb tk80_mon.hex'
+  end
 end
 
 desc "Run tests"

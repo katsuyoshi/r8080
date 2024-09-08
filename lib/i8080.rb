@@ -62,7 +62,7 @@ class I8080
 
   def initialize options={}
     @mem = options[:memory_manager] || MemoryManager.new
-    @io_delegate = options[:memory_manager] || IoDelegate.new
+    @io_delegate = options[:io_delegate] || IoDelegate.new
 
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
     @interrupt_enable = false
@@ -85,7 +85,7 @@ class I8080
     s_t = Time.now
     s_st = @state
     loop do
-
+  
       begin
         @sync_queue.pop
         execute
@@ -98,8 +98,12 @@ class I8080
       # adjust clock time
       t = Time.now
       st = @state
-      d = (st - s_st) / @clock - (t - s_t)
-      sleep d if d > 0
+      d = (st - s_st).to_f / @clock - (t - s_t)
+      if d > 0.03
+        sleep d
+        s_t = t
+        s_st = st
+      end
 
       break if cycle == 0
     end
@@ -110,7 +114,7 @@ class I8080
   def de;  @d << 8 | @e; end
   def hl;  @h << 8 | @l; end
 
-  def psw=v; @a = v >> 8; @f = v & 0xff; end
+  def psw=v; p caller if v == nil; @a = v >> 8; @f = v & 0xff; end
   def bc=v;  @b = v >> 8; @c = v & 0xff; end
   def de=v;  @d = v >> 8; @e = v & 0xff; end
   def hl=v;  @h = v >> 8; @l = v & 0xff; end
