@@ -107,7 +107,7 @@ hex = IntelHex.new(hex_file)
 hex.load
 data = hex.data
 
-cpu = I8080.new memory_manager: MemoryManager.new, io_delegate: PPI.new
+cpu = I8080.new memory_manager: MemoryManager.new, io_delegate: PPI.new, clock: 2048000
 cpu.mem.force_write {
   cpu.mem[0, data.size] = data
 }
