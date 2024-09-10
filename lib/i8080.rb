@@ -1077,23 +1077,23 @@ class I8080
     self.flg_ac = (hv & 0xf0) != 0      if set_f & FLG_AC != 0
 
   case r
-    when REG_A, REG_NONE
-      @a = v8 if r == REG_A
-    when REG_B
-      @b = v8
-    when REG_C
-      @c = v8
-    when REG_D
-      @d = v8
-    when REG_E
-      @e = v8
-    when REG_H
-      @h = v8
-    when REG_L
-      @l = v8
-    when REG_M
-      @mem[hl] = v8
-    end
+  when REG_A, REG_NONE
+    @a = v8 if r == REG_A
+  when REG_B
+    @b = v8
+  when REG_C
+    @c = v8
+  when REG_D
+    @d = v8
+  when REG_E
+    @e = v8
+  when REG_H
+    @h = v8
+  when REG_L
+    @l = v8
+  when REG_M
+    @mem[hl] = v8
+  end
 
   end
 
