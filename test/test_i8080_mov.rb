@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'i8080'
 
-class TestI8080 < Test::Unit::TestCase
+class TestI8080Move < Test::Unit::TestCase
 
   setup do
     @cpu = I8080.new

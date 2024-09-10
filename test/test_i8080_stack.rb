@@ -5,7 +5,7 @@ class I8080
   def _push_i16 data; push_i16 data; end
 end 
 
-class TestI8080 < Test::Unit::TestCase
+class TestI8080Stack < Test::Unit::TestCase
 
   setup do
     @cpu = I8080.new

@@ -98,11 +98,12 @@ class I8080
       # adjust clock time
       t = Time.now
       st = @state
-      d = (st - s_st).to_f / @clock - (t - s_t)
+      d = (st - s_st).to_f / @clock.to_f - (t - s_t)
       if d > 0.03
+#p [d, st, t, @clock]
         sleep d
-        s_t = t
-        s_st = st
+        #s_t = t
+        #s_st = st
       end
 
       break if cycle == 0
