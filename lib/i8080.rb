@@ -2,10 +2,11 @@
 class I8080
 
   attr_accessor :a, :f, :b, :c, :d, :e, :h, :l, :pc, :sp
-  attr_accessor :interrupt_enable, :interrupt_pending
+  attr_accessor :enabled_interrupt, :ei_pending
   attr_accessor :state, :clock
   attr_reader :mem, :model
   attr_reader :sync_queue
+  attr_accessor :interrupter
 
   attr_accessor :io_delegate
 
@@ -60,13 +61,26 @@ class I8080
     end
   end
 
+  class Interrupter
+
+    def interrupted? cpu
+      false
+    end
+    
+    def interrupt cpu
+      cpu.interrupt
+    end
+
+  end
+
   def initialize options={}
     @mem = options[:memory_manager] || MemoryManager.new
     @io_delegate = options[:io_delegate] || IoDelegate.new
+    @interrupter = options[:interrupter] || Interrupter.new
 
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
-    @interrupt_enable = false
-    @interrupt_pending = nil
+    @enabled_interrupt = true
+    @ei_pending = nil
     @clock = options[:clock] || 1000000
     @state = 0
     @sync_queue = Queue.new
@@ -88,9 +102,27 @@ class I8080
   
       begin
         @sync_queue.pop
+        
+        # DI needs to be delayed one cycle.
+        @ei_pending += 1 if @ei_pending
+
         execute
-      ensure
+        
+      # EI enables interrupts after the next instruction is executed.
+      # But the actual interrupt may be accepted during the next M1 cycle.
+      # So, the interrupt is accepted after two cycles.
+      if @ei_pending && @ei_pending >= 2
+          @enabled_interrupt = true
+          @ei_pending = nil
+        end
+    
         @sync_queue.push nil
+
+        if @interrupter&.interrupted?(self) && enabled_interrupt?
+          @interrupter.interrupt(self)
+          @enabled_interrupt = false
+        end
+
       end
 
       cycle -= 1 if cycle > 0
@@ -100,7 +132,6 @@ class I8080
       st = @state
       d = (st - s_st).to_f / @clock.to_f - (t - s_t)
       if d > 0.03
-#p [d, st, t, @clock]
         sleep d
         #s_t = t
         #s_st = st
@@ -133,6 +164,17 @@ class I8080
       print "#{n}:#{v.to_s(16).rjust(4, '0')} "
     end
     puts delimiter unless rollback
+  end
+
+  def print_address addr, delimiter=""
+    print delimiter + "#{addr.to_s(16).rjust(4, '0')}:"
+  end
+
+  def dump_mem addr, size, delimiter=""
+    (0...size).to_a.reverse.each do |i|
+      print "#{@mem[addr + i].to_s(16).rjust(2, '0')}"
+    end
+    print " "
   end
 
   def flg_s?
@@ -195,8 +237,8 @@ class I8080
     end
   end
 
-  def interrupt_enabled?
-    @interrupt_enable
+  def enabled_interrupt?
+    @enabled_interrupt
   end
 
   def hold
@@ -209,10 +251,9 @@ class I8080
   end
 
   def interrupt
-    return unless interrupt_enabled?
-    @sync_queue.pop
+    return false unless enabled_interrupt?
     rst 7
-    @sync_queue.push nil
+    true
   end
 
 
@@ -236,8 +277,6 @@ class I8080
   # --- execute
 
   def execute
-
-    @interrupt_pending += 1 if @interrupt_pending
 
     case @mem[@pc]
     when 0b00_000_000
@@ -402,12 +441,6 @@ class I8080
       mov_r_r
     
     end
-
-    if @interrupt_pending && @interrupt_pending >= 1
-      @interrupt_enable = true
-      @interrupt_pending = nil
-    end
-
 
   end
 
@@ -923,7 +956,7 @@ class I8080
   # If execcute it in interrupt, call it with vector no.
   def rst vect = nil
     if vect
-      v = b011_000_111 | (vect << 3)
+      v = 0b011_000_111 | (vect << 3)
     else
       v = @mem[@pc]; @pc += 1
     end
@@ -1020,14 +1053,14 @@ class I8080
 
   def ei
     @pc += 1
-    @interrupt_pending = 0
+    @ei_pending = 0
     @state += 4
   end
 
   def di
     @pc += 1
-    @interrupt_enable = false
-    @interrupt_pending = nil
+    @enabled_interrupt = false
+    @ei_pending = nil
     @state += 4
   end
 

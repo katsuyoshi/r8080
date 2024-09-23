@@ -82,9 +82,11 @@ class TestI8080 < Test::Unit::TestCase
   end
 
   test "NOP" do
+p "test nop #{@cpu.pc}"
     @cpu.mem[0] = 0b00_000_000
     @cpu.run 1
     assert_equal 1, @cpu.pc
+p "test nop #{@cpu.pc}"
     assert_equal 4, @cpu.state
   end
 
@@ -95,17 +97,26 @@ class TestI8080 < Test::Unit::TestCase
     assert_equal 7, @cpu.state
   end
 
+  # EI enables interrupts after the next instruction is executed.
+  # But the actual interrupt may be accepted during the next M1 cycle.
+  # So, the interrupt is accepted after two cycles.
   test "EI" do
+    @cpu.enabled_interrupt = false
     @cpu.mem[0] = 0b11_111_011
     @cpu.mem[1] = 0b00_000_000
+    @cpu.mem[2] = 0b00_000_000
     @cpu.run 1
-    assert_equal false, @cpu.interrupt_enabled?
+    assert_equal false, @cpu.enabled_interrupt?
     assert_equal 1, @cpu.pc
     assert_equal 4, @cpu.state
     @cpu.run 1
-    assert_equal true, @cpu.interrupt_enabled?
+    assert_equal false, @cpu.enabled_interrupt?
     assert_equal 2, @cpu.pc
     assert_equal 8, @cpu.state
+    @cpu.run 1
+    assert_equal true, @cpu.enabled_interrupt?
+    assert_equal 3, @cpu.pc
+    assert_equal 12, @cpu.state
   end
 
   test "DI" do
@@ -113,11 +124,11 @@ class TestI8080 < Test::Unit::TestCase
     @cpu.mem[1] = 0b00_000_000
     @cpu.mem[2] = 0b11_110_011
     @cpu.run 2
-    assert_equal true, @cpu.interrupt_enabled?
+    assert_equal true, @cpu.enabled_interrupt?
     assert_equal 2, @cpu.pc
     assert_equal 8, @cpu.state
     @cpu.run 1
-    assert_equal false, @cpu.interrupt_enabled?
+    assert_equal false, @cpu.enabled_interrupt?
     assert_equal 3, @cpu.pc
     assert_equal 12, @cpu.state
   end

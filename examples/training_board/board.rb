@@ -6,7 +6,7 @@ require 'ppi'
 require 'intel_hex'
 require 'seven_segment'
 require 'io/console'
-
+require 'debug'
 
 hex_file = ARGV[0] || 'seven_segment.hex'
 
@@ -101,46 +101,107 @@ class MemoryManager < I8080::MemoryManager
 
 end
 
+class Interrupter < I8080::Interrupter
+  attr_accessor :step
+
+  def initialize
+    super
+    @step = false
+  end
+
+  def step?
+    @step
+  end
+
+  def toggle
+    @step = !@step
+  end
+
+  def interrupted? cpu
+    step?
+  end
+
+  def interrupt cpu
+    super
+  end
+
+  
+end
+
+
 
 
 hex = IntelHex.new(hex_file)
 hex.load
 data = hex.data
 
-cpu = I8080.new memory_manager: MemoryManager.new, io_delegate: PPI.new, clock: 2048000
+cpu = I8080.new memory_manager: MemoryManager.new, io_delegate: PPI.new, clock: 2048000, interrupter: Interrupter.new
 cpu.mem.force_write {
   cpu.mem[0, data.size] = data
 }
 seg = SevenSegmentDisplay.new
 
+# run cpu in t1 thread
 t1 = Thread.new do
   cpu.run
 end
 
+# display segments and registers in t2 thread
 t2 = Thread.new do
   delimiter = "\r"
   #i = 0
   loop do
     cpu.hold {
       s = Time.now
+
+      # display segments
       puts
       8.times do |i|
         seg[i] = cpu.mem[0x83f8 + i]
       end
+
+      # clear line
       seg.puts delimiter
+      
+      # display registers
       cpu.dump_regs delimiter
+
+      # display stored pc and sp
+      cpu.print_address 0x83e0, delimiter
+      cpu.dump_mem 0x83e0, 2
+      cpu.dump_mem 0x83e2, 2
+
+      # display breake point and break count
+      cpu.print_address 0x83f0
+      cpu.dump_mem 0x83f0, 2
+      cpu.dump_mem 0x83f2, 1
+
+      # display step mode
+      print "STEP: #{cpu.interrupter.step? ? "ON " : "OFF"}"
       print "\e[7A"
-      #print "%.6f" % (Time.now - s)
-      #i = (i + 1) % 8
+
     }
     sleep 0.03
   end
 end
 
+# Make key input to ppi input value in main thead.
 # NOTE: ↑: 0x44, ↓: 0x42, →: 0x43, ←: 0x41, ESC: 0x1b
 while true
   c = $stdin.getch
   case c
+  when "\e"
+    c1 = $stdin.getch
+    case c1
+    when '['
+      c2 = $stdin.getch
+      case c2
+      when 'A'
+        cpu.interrupter.step = true
+      when 'B'
+        cpu.interrupter.step = false
+      end
+    end
   when ?\C-c
     exit
   when nil

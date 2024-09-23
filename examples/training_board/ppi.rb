@@ -1,6 +1,5 @@
 require 'i8080'
 
-
 class PPI < I8080::IoDelegate
 
   attr_reader :mode_a, :mode_b, :mode_c_l, :mode_c_h
@@ -21,6 +20,8 @@ class PPI < I8080::IoDelegate
   KEY_WRITE_INC = "/".ord
   KEY_STORE_DATA = 'S'.ord
   KEY_LOAD_DATA = 'L'.ord
+  KEY_STEP_ON = '↑'.ord
+  KEY_STEP_OFF = '↓'.ord
 
   def initialize
     super
