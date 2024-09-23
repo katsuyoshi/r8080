@@ -108,21 +108,21 @@ class I8080
 
         execute
         
-      # EI enables interrupts after the next instruction is executed.
-      # But the actual interrupt may be accepted during the next M1 cycle.
-      # So, the interrupt is accepted after two cycles.
-      if @ei_pending && @ei_pending >= 2
+        # EI enables interrupts after the next instruction is executed.
+        # But the actual interrupt may be accepted during the next M1 cycle.
+        # So, the interrupt is accepted after two cycles.
+        if @ei_pending && @ei_pending >= 2
           @enabled_interrupt = true
           @ei_pending = nil
         end
     
-        @sync_queue.push nil
-
         if @interrupter&.interrupted?(self) && enabled_interrupt?
           @interrupter.interrupt(self)
           @enabled_interrupt = false
         end
 
+      ensure
+        @sync_queue.push nil
       end
 
       cycle -= 1 if cycle > 0

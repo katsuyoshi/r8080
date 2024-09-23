@@ -10,6 +10,16 @@ require 'debug'
 
 hex_file = ARGV[0] || 'seven_segment.hex'
 
+@print_queue = Queue.new
+@print_queue.push nil
+
+def print_sync
+  @print_queue.pop
+  yield
+ensure
+  @print_queue.push nil
+end
+
 class MemoryManager < I8080::MemoryManager
 
   def initialize(options={})
@@ -128,6 +138,25 @@ class Interrupter < I8080::Interrupter
   
 end
 
+def display_help
+  delimiter = "\r"
+
+  10.times do
+    puts delimiter
+  end
+
+  [
+    "0-9, A-F: hex key",
+    "↩️: RET         R: RUN         SP: ADRS SET",
+    "<: READ DECR   >: READ INCR   /: WRITE INCR",
+    "S: STORE DATA  L: LOAD DATA",
+    "H: Help",
+  ].each do |s|
+    puts s + delimiter
+  end
+
+end
+
 
 
 
@@ -152,34 +181,33 @@ t2 = Thread.new do
   #i = 0
   loop do
     cpu.hold {
-      s = Time.now
+      print_sync {
+        # display segments
+        puts
+        8.times do |i|
+          seg[i] = cpu.mem[0x83f8 + i]
+        end
 
-      # display segments
-      puts
-      8.times do |i|
-        seg[i] = cpu.mem[0x83f8 + i]
-      end
+        # clear line
+        seg.puts delimiter
+        
+        # display registers
+        cpu.dump_regs delimiter
 
-      # clear line
-      seg.puts delimiter
-      
-      # display registers
-      cpu.dump_regs delimiter
+        # display stored pc and sp
+        cpu.print_address 0x83e0, delimiter
+        cpu.dump_mem 0x83e0, 2
+        cpu.dump_mem 0x83e2, 2
 
-      # display stored pc and sp
-      cpu.print_address 0x83e0, delimiter
-      cpu.dump_mem 0x83e0, 2
-      cpu.dump_mem 0x83e2, 2
+        # display breake point and break count
+        cpu.print_address 0x83f0
+        cpu.dump_mem 0x83f0, 2
+        cpu.dump_mem 0x83f2, 1
 
-      # display breake point and break count
-      cpu.print_address 0x83f0
-      cpu.dump_mem 0x83f0, 2
-      cpu.dump_mem 0x83f2, 1
-
-      # display step mode
-      print "STEP: #{cpu.interrupter.step? ? "ON " : "OFF"}"
-      print "\e[7A"
-
+        # display step mode
+        print "STEP: #{cpu.interrupter.step? ? "ON " : "OFF"}"
+        print "\e[7A"
+      }
     }
     sleep 0.03
   end
@@ -205,6 +233,10 @@ while true
   when ?\C-c
     exit
   when nil
+  when 'H', 'h'
+    print_sync {
+      display_help
+    }
   else
     cpu.io_delegate.press c.upcase
     sleep 0.03
