@@ -25,6 +25,11 @@ class PPI < I8080::IoDelegate
 
   def initialize
     super
+    reset
+  end
+
+  def reset
+    super
     @port_a = 0
     @port_b = 0
     @port_c = 0
@@ -46,7 +51,7 @@ class PPI < I8080::IoDelegate
   # RUN: R, RET: RETURN, ADRS SET: SPACE,
   # READ DEC: ',(<)', READ INC: .(>), WRITE INC: /(?),
   # STORE DATA: S, LOAD DATA: L
-  # RESET: ESC
+  # RESET: TAB
   def in port
     case port & 0x3
     when 0

@@ -39,9 +39,15 @@ class I8080
   # You should override this class to implement IO. And set it to io_delegate.
   class IoDelegate
     attr_accessor :values
+    
     def initialize
       @values = {}
     end
+    
+    def reset
+      @values = {}
+    end
+
     def in port; values[port] || 0; end
     def out port, data; values[port] = data end
     def reset; end
@@ -87,6 +93,24 @@ class I8080
     @sync_queue.push nil
   end
 
+  def reset
+    sync do
+      @enabled_interrupt = false
+      @pc = 0
+      @io_delegate&.reset
+    end
+  end
+
+  def sync
+    begin
+      @sync_queue.pop
+      yield
+    ensure
+      @sync_queue.push nil
+    end
+  end
+  alias :hold :sync
+
   def memory_manager
     @mem
   end
@@ -100,9 +124,7 @@ class I8080
     s_st = @state
     loop do
   
-      begin
-        @sync_queue.pop
-        
+      sync do
         # DI needs to be delayed one cycle.
         @ei_pending += 1 if @ei_pending
 
@@ -121,8 +143,6 @@ class I8080
           @enabled_interrupt = false
         end
 
-      ensure
-        @sync_queue.push nil
       end
 
       cycle -= 1 if cycle > 0
@@ -239,15 +259,6 @@ class I8080
 
   def enabled_interrupt?
     @enabled_interrupt
-  end
-
-  def hold
-    begin
-      @sync_queue.pop
-      yield
-    ensure
-      @sync_queue.push nil
-    end
   end
 
   def interrupt

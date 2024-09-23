@@ -150,7 +150,7 @@ def display_help
     "↩️: RET         R: RUN         SP: ADRS SET",
     "<: READ DECR   >: READ INCR   /: WRITE INCR",
     "S: STORE DATA  L: LOAD DATA",
-    "H: Help",
+    "TAB: RESET     H: Help",
   ].each do |s|
     puts s + delimiter
   end
@@ -233,6 +233,8 @@ while true
   when ?\C-c
     exit
   when nil
+  when "\t"
+    cpu.reset
   when 'H', 'h'
     print_sync {
       display_help
