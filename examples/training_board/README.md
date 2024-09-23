@@ -33,4 +33,4 @@ This is a demo running with a simulated NEC training board TK-80.　
 I haven't put its program. It is included this book [復活!TK‐80](https://www.amazon.co.jp/復活-TK%E2%80%9080-榊-正憲/dp/4756134017/ref=sr_1_fkmr1_1?crid=7CNL886TOUI7&dib=eyJ2IjoiMSJ9.3wTlBjMJAKD07JSy-RZxBidpuAM_dTvLP7hpY0NPmeBoN0uBqfEYulK7K4aUJEYidREhxmFYKYRoT1I0JacoZM7BgoexTdPQR_OcxSNuo8l8ZK4YHAivXZIINaPzL4Am.c21grxQatW19Ex_NWu53Yr-bt3IedpINKGdsMPW5soc&dib_tag=se&keywords=復活+tk-80&qid=1725758678&sprefix=復活TK%2Caps%2C178&sr=8-1-fkmr1).
 
 
-[![](https://img.youtube.com/vi/qsoQFyC80Ls/0.jpg)](https://www.youtube.com/watch?v=qsoQFyC80Ls)
+[![](https://img.youtube.com/vi/Hv5nwtVhZ7k/0.jpg)](https://www.youtube.com/watch?v=Hv5nwtVhZ7k)
