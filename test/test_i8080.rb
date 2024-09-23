@@ -120,6 +120,7 @@ p "test nop #{@cpu.pc}"
   end
 
   test "DI" do
+    @cpu.enabled_interrupt = true
     @cpu.mem[0] = 0b11_111_011
     @cpu.mem[1] = 0b00_000_000
     @cpu.mem[2] = 0b11_110_011

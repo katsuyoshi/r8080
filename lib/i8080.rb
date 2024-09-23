@@ -79,7 +79,7 @@ class I8080
     @interrupter = options[:interrupter] || Interrupter.new
 
     @a = 0; @f = 0x02; @b = 0; @c = 0; @d = 0; @e = 0; @h = 0; @l = 0; @pc = 0; @sp = 0
-    @enabled_interrupt = true
+    @enabled_interrupt = false
     @ei_pending = nil
     @clock = options[:clock] || 1000000
     @state = 0
