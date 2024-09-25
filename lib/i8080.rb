@@ -95,6 +95,7 @@ class I8080
 
   def reset
     sync do
+      yield if block_given?
       @enabled_interrupt = false
       @pc = 0
       @io_delegate&.reset

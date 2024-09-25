@@ -1,3 +1,6 @@
 test.hex
 examples/training_board/tk80_mon.*
 movies
+board.hex
+examples/training_board/mon_tutorial_1.hex
+examples/training_board/mon_tutorial_2.hex

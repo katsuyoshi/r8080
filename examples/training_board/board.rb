@@ -10,6 +10,8 @@ require 'debug'
 
 hex_file = ARGV[0] || 'seven_segment.hex'
 
+BOARD_HEX_FILE = 'board.hex'
+
 @print_queue = Queue.new
 @print_queue.push nil
 
@@ -38,7 +40,7 @@ class MemoryManager < I8080::MemoryManager
       case args[0]
       when Range
         args[0].map do |i|
-          a = i & 0x83ff
+          a = i
           if @rom.include?(a) || @ram.include?(a)
             @mem[a]
           else
@@ -46,7 +48,7 @@ class MemoryManager < I8080::MemoryManager
           end
         end
       else
-        a = args[0] & 0x83ff
+        a = args[0]
         if @rom.include?(a) || @ram.include?(a)
           @mem[a]
         else
@@ -59,7 +61,7 @@ class MemoryManager < I8080::MemoryManager
       size = args[1]
       a = []
       size.times do |i|
-        a << self[(addr + i) & 0x83ff]
+        a << self[addr + i]
       end
       a
     end
@@ -72,13 +74,13 @@ class MemoryManager < I8080::MemoryManager
       case args[0]
       when Range
         args[0].each_with_index do |a, i|
-          adr = a & 0x83ff
+          adr = a
           if @force || @ram.include?(adr)
             @mem[adr] = v[i]
           end
         end
       else
-        adr = args[0] & 0x83ff
+        adr = args[0]
         if @force || @ram.include?(adr)
           @mem[adr] = v
         else
@@ -92,7 +94,7 @@ class MemoryManager < I8080::MemoryManager
       v = args[2]
       size.times do |i|
         if @force || @ram.include?(adr)
-          @mem[(adr + i) & 0x83ff] = v[i]
+          @mem[(adr + i)] = v[i]
         end
       end
     end
@@ -158,14 +160,11 @@ def display_help
 end
 
 
-
-
-hex = IntelHex.new(hex_file)
-hex.load
-data = hex.data
-
+# create cpu and seven segment display
 cpu = I8080.new memory_manager: MemoryManager.new, io_delegate: PPI.new, clock: 2048000, interrupter: Interrupter.new
+# load hex file
 cpu.mem.force_write {
+  data = IntelHex.load(hex_file)
   cpu.mem[0, data.size] = data
 }
 seg = SevenSegmentDisplay.new
@@ -233,9 +232,22 @@ while true
   when ?\C-c
     exit
   when nil
+  when /s/i
+    cpu.sync {
+      data = cpu.memory_manager.mem
+      IntelHex.save(BOARD_HEX_FILE, data, 0 => data.size)
+      data2 = IntelHex.load(BOARD_HEX_FILE)
+    }
+  when /l/i
+    cpu.reset {
+      cpu.mem.force_write {
+        data = IntelHex.load(BOARD_HEX_FILE)
+        cpu.mem[0, data.size] = data
+      } 
+    } if File.exist?(BOARD_HEX_FILE)
   when "\t"
     cpu.reset
-  when 'H', 'h'
+  when /h/i
     print_sync {
       display_help
     }
