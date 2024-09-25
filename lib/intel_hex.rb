@@ -48,7 +48,7 @@ class IntelHex
           d = @data[addr, s]
           f.write(d.map { |x| (x || 0).to_s(16).upcase.rjust(2, "0") }.join)
           sum = d.inject(sum) { |sum, x| sum + x }
-          f.write((0x100 - (sum & 0xFF)).to_s(16).upcase.rjust(2, "0"))
+          f.write(((0x100 - (sum & 0xFF)) & 0xff).to_s(16).upcase.rjust(2, "0"))
           f.write("\n")
           addr += s
         end

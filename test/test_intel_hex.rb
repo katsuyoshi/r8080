@@ -41,3 +41,24 @@ class TestIntelHex < Test::Unit::TestCase
   end
 
 end
+
+
+class TestIntelHexChecksum < Test::Unit::TestCase
+
+  setup do
+    @data = [0] * 0x2000
+    @hex = IntelHex.new "test.hex", @data
+  end
+
+  teardown do
+    File.delete "test.hex"
+  end
+
+  test "save" do
+    @hex.save(0x10e0 => 0x10)
+    assert_equal File.read("test.hex"), 
+    ":1010E0000000000000000000000000000000000000\n" +
+    ":00000001FF\n"
+  end
+
+end
