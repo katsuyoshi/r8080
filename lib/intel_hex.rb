@@ -3,6 +3,17 @@ class IntelHex
   attr_reader :filename
   attr_reader :data
 
+  def self.load filename
+    hex = IntelHex.new filename
+    hex.load
+    hex.data
+  end
+
+  def self.save filename, data, ranges = {}
+    hex = IntelHex.new filename, data
+    hex.save ranges
+  end
+
   def initialize filename, data = []
     @filename = filename
     @data = data || []
@@ -33,6 +44,7 @@ class IntelHex
     end
   end
 
+  # ranges = { addr => size, ... }
   def save(ranges = {})
     File.open(@filename, "w") do |f|
       ranges.each do |range|
