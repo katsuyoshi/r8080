@@ -453,7 +453,7 @@ class I8080
       mov_r_r
     
     end
-
+    @pc &= 0xffff
   end
 
 
