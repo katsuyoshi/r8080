@@ -1,7 +1,6 @@
 require 'dxopal'
 require_remote 'i8080.rb'
 require_remote 'memory_manager.rb'
-require_remote 'intel_hex.rb'
 require_remote 'rom.rb'
 
 include DXOpal
