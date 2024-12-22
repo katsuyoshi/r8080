@@ -26,3 +26,8 @@ end
 path = File.join(dir, '..', 'rom.hex')
 hex = IntelHex.new path, mm
 hex.save(0 => mm.size)
+
+path = File.join(dir, '..', 'rom.rb')
+File.write(path, "@rom = [\n" + mm.each_slice(16).map{|e| "  " + e.map{|f| "0x%02X" % f}.join(',')}.join(",\n") + "\n]\n")
+#s = File.read(path)
+#File.write(path.gsub(/\.hex/, '.rb'), "@rom_hex = \"\n" + s + "\"\n")
