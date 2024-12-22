@@ -113,13 +113,13 @@ class MemoryManager < I8080::MemoryManager
     y = @size[:height] - (idx % @size[:height])
     v = val
     8.times do |i|
-      if v & 0x80 == 0x80
+      if v & 0x01 == 0x01
         @vram_image.draw(x, y, @dot_on)
       else
         @vram_image.draw(x, y, @dot_off)
       end
       y -= 1
-      v <<= 1
+      v >>= 1
     end
   end
 
