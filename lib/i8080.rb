@@ -73,8 +73,8 @@ class I8080
       false
     end
     
-    def interrupt cpu
-      cpu.interrupt
+    def interrupt cpu, no=7
+      cpu.interrupt no
     end
 
   end
@@ -262,9 +262,9 @@ class I8080
     @enabled_interrupt
   end
 
-  def interrupt
+  def interrupt no=7
     return false unless enabled_interrupt?
-    rst 7
+    rst no
     true
   end
 

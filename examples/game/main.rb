@@ -5,8 +5,35 @@ require_remote 'rom.rb'
 
 include DXOpal
 
-@cpu = I8080.new
-t_ex = Time.now
+class Timer
+
+  def initialize interval
+    @interval = interval
+    start
+  end
+
+  def start
+    @start = Time.now
+  end
+
+  def elapsed
+    Time.now - @start
+  end
+
+  def fired?
+    f = elapsed >= @interval
+    if f
+      start
+    end
+    f
+  end
+
+end
+
+
+@cpu = I8080.new clock: 1_996_800
+@refresh_rate = 60
+@refresh_state = (@cpu.clock / @refresh_rate).to_i
 
 mm = MemoryManager.new rom: (0..0x1fff), ram: (0x2000..0x23ff), vram: (0x2400..0x3fff)
 @cpu.memory_manager = mm
@@ -50,28 +77,33 @@ end
 
 #vram_test_set
 
+Window.fps = @refresh_rate
+
 Window.load_resources do
   Window.bgcolor = C_BLACK
-  ex_key_down = false #Input.key_down?(K_S)
+  # ex_key_down = false #Input.key_down?(K_S)
   
-  Window.loop do
-    #now = Time.now
-    #d = now - t_ex
-    #t_ex = now
+  isr_toggle = false
 
-    key_down = Input.key_down?(K_S)
-    if true #key_down && !ex_key_down
+  Window.loop do
+    # key_down = Input.key_down?(K_S)
+    # if true #key_down && !ex_key_down
+    #   @cpu.run(1)
+    # end
+    # ex_key_down = key_down
+    
+
+    while @cpu.state < @refresh_state
       @cpu.run(1)
     end
-    ex_key_down = key_down
-    #@cpu.state = 0
-    #c = d * @cpu.clock
-    #while @cpu.state < c
-    #  @cpu.run(1)
-    #end
+
     Window.draw(0, 0, @cpu.mem.vram_image)
-    # regs_info(@cpu).each_line.with_index do |line, i|
-    #   Window.draw_font(0, i * 20, line.chomp, Font.default, color: C_WHITE)
-    # end
+    "#{regs_info(@cpu)}\n#{Window.real_fps}Hz state: #{@cpu.state} #{@refresh_state}".each_line.with_index do |line, i|
+      Window.draw_font(0, 300 + i * 20, line.chomp, Font.default, color: C_WHITE)
+    end
+
+    @cpu.interrupter.interrupt @cpu, isr_toggle ? 2 : 1
+    isr_toggle = !isr_toggle
+    @cpu.state -= @refresh_state
   end
 end
