@@ -63,6 +63,7 @@ def display_help
     "<: READ DECR   >: READ INCR   /: WRITE INCR",
     "S: STORE DATA  L: LOAD DATA",
     "TAB: RESET     H: Help",
+    "↑:STEP ON      ↓: STEP OFF"
   ].each do |s|
     puts s + delimiter
   end
