@@ -545,9 +545,7 @@ class I8080
 
   def cpi_i
     @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    i = @mem[h << 8 | l]
+    i = @mem[@pc]; @pc += 1
     a = read_r(REG_A)
     write_r REG_NONE, a - i, (a & 0xf) - (i & 0xf), FLGS_ALL
     @state += 7
