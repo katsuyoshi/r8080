@@ -2,6 +2,7 @@ require 'dxopal'
 require_remote 'i8080.rb'
 require_remote 'memory_manager.rb'
 require_remote 'rom.rb'
+require_remote 'io.rb'
 
 include DXOpal
 
@@ -32,11 +33,14 @@ end
 
 
 @cpu = I8080.new clock: 1_996_800
-@refresh_rate = 60
+@refresh_rate = 120
 @refresh_state = (@cpu.clock / @refresh_rate).to_i
 
 mm = MemoryManager.new rom: (0..0x1fff), ram: (0x2000..0x23ff), vram: (0x2400..0x3fff)
 @cpu.memory_manager = mm
+
+@io = Io.new
+@cpu.io_delegate = @io
 
 # Load ROM
 @cpu.mem.force_write {
@@ -75,35 +79,110 @@ p_ w: w, h: h
   end
 end
 
+def key_push?
+  keys = [K_B, K_D, K_S, K_C, K_O]
+  keys.each do |k|
+    return k if Input.key_push?(k)
+  end
+  false
+end
+
+class Debug
+  attr_accessor :enabled_brakepoint
+  attr_accessor :debug_mode
+  attr_accessor :break_points
+
+  def initialize
+    @break_points = []
+  end
+
+  def toggle_breakepoint
+    @enabled_brakepoint = !@enabled_brakepoint
+  end
+
+  def toggle_debug_mode
+    @debug_mode = !@debug_mode
+  end
+
+  def fired_brakpoint? pc
+    return false unless @enabled_brakepoint
+    @break_points.include?(pc)
+  end
+
+  def inspect
+    "MODE: #{@debug_mode} BREAK: #{@enabled_brakepoint}"
+  end
+
+end
+
+@debug = Debug.new
+@debug.break_points = [
+  #0x008c,
+  #0x1439,
+  #0x42
+  #0x1837
+  #0x1815
+]
+@debug.enabled_brakepoint = true
+
 #vram_test_set
 
 Window.fps = @refresh_rate
 
 Window.load_resources do
   Window.bgcolor = C_BLACK
-  # ex_key_down = false #Input.key_down?(K_S)
   
   isr_toggle = false
 
   Window.loop do
-    # key_down = Input.key_down?(K_S)
-    # if true #key_down && !ex_key_down
-    #   @cpu.run(1)
-    # end
-    # ex_key_down = key_down
-    
+    step = false
+    step_out = false
 
-    while @cpu.state < @refresh_state
-      @cpu.run(1)
+    case key_push?
+    when K_B
+      @debug.toggle_breakepoint
+    when K_D
+      @debug.toggle_debug_mode
+    when K_S
+      step = true
+    when K_C
+      @debug.debug_mode = false
+    when K_O
+      step_out = true
+    end
+
+    if @debug.debug_mode
+      if step
+        @cpu.run(1)
+      end
+      if step_out
+        while @cpu.mem[@cpu.pc] != 0xc9 # RET
+          @cpu.run(1)
+        end
+      end
+    else
+      while @cpu.state < @refresh_state
+        @cpu.run(1)
+        if @debug.fired_brakpoint?(@cpu.pc)
+          @debug.debug_mode = true
+          break
+        end
+      end
     end
 
     Window.draw(0, 0, @cpu.mem.vram_image)
-    "#{regs_info(@cpu)}\n#{Window.real_fps}Hz state: #{@cpu.state} #{@refresh_state}".each_line.with_index do |line, i|
+    "#{regs_info(@cpu)}\n#{Window.real_fps}Hz state: #{@cpu.state} #{@refresh_state}\n#{@debug.inspect}".each_line.with_index do |line, i|
       Window.draw_font(0, 300 + i * 20, line.chomp, Font.default, color: C_WHITE)
     end
 
-    @cpu.interrupter.interrupt @cpu, isr_toggle ? 2 : 1
-    isr_toggle = !isr_toggle
-    @cpu.state -= @refresh_state
+    if @cpu.state >= @refresh_state
+      #while @cpu.enabled_interrupt == false
+      #  @cpu.run(1)
+      #end
+      @cpu.interrupter.interrupt @cpu, isr_toggle ? 2 : 1
+      isr_toggle = !isr_toggle
+      @cpu.state -= @refresh_state
+    end
+
   end
 end
