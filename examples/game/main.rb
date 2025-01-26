@@ -180,9 +180,6 @@ Window.load_resources do
     end
 
     if @cpu.state >= @refresh_state
-      #while @cpu.enabled_interrupt == false
-      #  @cpu.run(1)
-      #end
       @cpu.interrupter.interrupt @cpu, isr_toggle ? 2 : 1
       isr_toggle = !isr_toggle
       @cpu.state -= @refresh_state
