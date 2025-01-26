@@ -88,7 +88,7 @@ def key_push?
 end
 
 class Debug
-  attr_accessor :enabled_brakepoint
+  attr_accessor :enabled_breakpoint
   attr_accessor :debug_mode
   attr_accessor :break_points
 
@@ -96,21 +96,21 @@ class Debug
     @break_points = []
   end
 
-  def toggle_breakepoint
-    @enabled_brakepoint = !@enabled_brakepoint
+  def toggle_breakpoint
+    @enabled_breakpoint = !@enabled_breakpoint
   end
 
   def toggle_debug_mode
     @debug_mode = !@debug_mode
   end
 
-  def fired_brakpoint? pc
-    return false unless @enabled_brakepoint
+  def fired_breakpoint? pc
+    return false unless @enabled_breakpoint
     @break_points.include?(pc)
   end
 
   def inspect
-    "MODE: #{@debug_mode} BREAK: #{@enabled_brakepoint}"
+    "MODE: #{@debug_mode} BREAK: #{@enabled_breakpoint}"
   end
 
 end
@@ -126,9 +126,10 @@ end
   #0x14A4,
   #0x14B8,
 ]
-@debug.enabled_brakepoint = true
+@debug.enabled_breakpoint = true
 
 #vram_test_set
+
 
 Window.fps = @refresh_rate
 
@@ -143,7 +144,7 @@ Window.load_resources do
 
     case key_push?
     when K_B
-      @debug.toggle_breakepoint
+      @debug.toggle_breakpoint
     when K_D
       @debug.toggle_debug_mode
     when K_S
@@ -166,7 +167,7 @@ Window.load_resources do
     else
       while @cpu.state < @refresh_state
         @cpu.run(1)
-        if @debug.fired_brakpoint?(@cpu.pc)
+        if @debug.fired_breakpoint?(@cpu.pc)
           @debug.debug_mode = true
           break
         end
