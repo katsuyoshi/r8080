@@ -161,6 +161,25 @@ Window.load_resources do
       step_out = true
     end
 
+    # Key inputs for play
+    #  up arrow: insert coin
+    #  z: move left button
+    #  x: move right button
+    #  space: shot button
+    #  1: one player button
+    #  2: two player button
+    #  t: tilt
+    @cpu.io_delegate.tap do |io|
+      io.players.each_with_index do |player, i|
+        player[:left] = Input.key_down? K_Z
+        player[:right] = Input.key_down? K_X
+        player[:shot] = Input.key_down? K_SPACE
+        player[:start] = Input.key_down?(i == 0 ? K_1 : K_2)
+      end
+      io.credit = Input.key_down? K_UP
+      io.tilt = Input.key_down? K_T
+    end
+
     if @debug.debug_mode
       if step
         @cpu.run(1)
