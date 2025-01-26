@@ -142,6 +142,12 @@ Window.load_resources do
     step = false
     step_out = false
 
+    # key inputs for debugging
+    # It similar to GDB
+    #  b: toggle enabled breakpoints
+    #  d: toggle debug mode
+    #  s: step
+    #  c: continue
     case key_push?
     when K_B
       @debug.toggle_breakpoint
