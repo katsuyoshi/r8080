@@ -27,7 +27,7 @@ class MemoryManager < I8080::MemoryManager
       when Range
         args[0].map do |i|
           addr = i & @mask
-          if @rom.include?(addr) || @ram.include?(addr)
+          if @rom.include?(addr) || @ram.include?(addr) || @vram.include?(addr)
             @mem[addr]
           else
             0
@@ -35,7 +35,7 @@ class MemoryManager < I8080::MemoryManager
         end
       else
         addr = args[0] & @mask
-        if @rom.include?(addr) || @ram.include?(addr)
+        if @rom.include?(addr) || @ram.include?(addr) || @vram.include?(addr)
           @mem[addr]
         else
           0
