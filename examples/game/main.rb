@@ -33,8 +33,8 @@ end
 
 
 @cpu = I8080.new clock: 1_996_800
-@refresh_rate = 120
-@refresh_state = (@cpu.clock / @refresh_rate).to_i
+@isr_rate = 180
+@isr_state = (@cpu.clock / @isr_rate).to_i
 
 mm = MemoryManager.new rom: (0..0x1fff), ram: (0x2000..0x23ff), vram: (0x2400..0x3fff)
 @cpu.memory_manager = mm
@@ -130,8 +130,15 @@ end
 
 #vram_test_set
 
+@scale = 2.0
+@margin = 32
+@width = @cpu.mem.size[:width]
+@height = @cpu.mem.size[:height]
 
-Window.fps = @refresh_rate
+Window.width = @width * @scale + @margin * 2
+Window.height = @height * @scale + @margin * 2
+
+Window.fps = @isr_rate
 
 Window.load_resources do
   Window.bgcolor = C_BLACK
@@ -190,7 +197,7 @@ Window.load_resources do
         end
       end
     else
-      while @cpu.state < @refresh_state
+      while @cpu.state < @isr_state
         @cpu.run(1)
         if @debug.fired_breakpoint?(@cpu.pc)
           @debug.debug_mode = true
@@ -199,15 +206,18 @@ Window.load_resources do
       end
     end
 
-    Window.draw(0, 0, @cpu.mem.vram_image)
-    "#{regs_info(@cpu)}\n#{Window.real_fps}Hz state: #{@cpu.state} #{@refresh_state}\n#{@debug.inspect}".each_line.with_index do |line, i|
-      Window.draw_font(0, 300 + i * 20, line.chomp, Font.default, color: C_WHITE)
-    end
-
-    if @cpu.state >= @refresh_state
+    if @cpu.state >= @isr_state
       @cpu.interrupter.interrupt @cpu, isr_toggle ? 2 : 1
       isr_toggle = !isr_toggle
-      @cpu.state -= @refresh_state
+      @cpu.state -= @isr_state
+    end
+
+    Window.draw_scale(@margin, @margin, @cpu.mem.vram_image, @scale, @scale, 0, 0)
+
+    if @debug.debug_mode
+      "#{regs_info(@cpu)}\n#{Window.real_fps}Hz state: #{@cpu.state} #{@isr_state}\n#{@debug.inspect}".each_line.with_index do |line, i|
+        Window.draw_font(0, @height * @scale - (5 - i) * 20, line.chomp, Font.default, color: C_WHITE)
+      end
     end
 
   end
