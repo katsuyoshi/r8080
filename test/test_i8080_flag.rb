@@ -66,8 +66,6 @@ class TestI8080Flag < Test::Unit::TestCase
     test "CPI 0x8000 (case zero) -> z p" do
       @cpu.mem[0] = 0b11_111_110
       @cpu.mem[1] = 0x00
-      @cpu.mem[2] = 0x80
-      @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b0_1_0_0_0_1_1_0, @cpu.f
     end
@@ -75,19 +73,15 @@ class TestI8080Flag < Test::Unit::TestCase
     test "CPI 0x8000 (case minus) -> s p" do
       @cpu.mem[0] = 0b11_111_110
       @cpu.mem[1] = 0x00
-      @cpu.mem[2] = 0x80
       @cpu.a = 0xff
-      @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b1_0_0_0_0_1_1_0, @cpu.f
     end
 
     test "CPI 0x8000 (case carry) -> s p ac cy" do
       @cpu.mem[0] = 0b11_111_110
-      @cpu.mem[1] = 0x00
-      @cpu.mem[2] = 0x80
+      @cpu.mem[1] = 0x01
       @cpu.a = 0x00
-      @cpu.mem[0x8000] = 0x01
       @cpu.run 1
       assert_equal 0b1_0_0_1_0_1_1_1, @cpu.f
     end
@@ -95,9 +89,7 @@ class TestI8080Flag < Test::Unit::TestCase
     test "CPI 0x8000 (case parity off) -> s p ac cy" do
       @cpu.mem[0] = 0b11_111_110
       @cpu.mem[1] = 0x00
-      @cpu.mem[2] = 0x80
       @cpu.a = 0x01
-      @cpu.mem[0x8000] = 0x00
       @cpu.run 1
       assert_equal 0b0_0_0_0_0_0_1_0, @cpu.f
     end

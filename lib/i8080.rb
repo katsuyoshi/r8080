@@ -73,8 +73,8 @@ class I8080
       false
     end
     
-    def interrupt cpu
-      cpu.interrupt
+    def interrupt cpu, no=7
+      cpu.interrupt no
     end
 
   end
@@ -262,9 +262,9 @@ class I8080
     @enabled_interrupt
   end
 
-  def interrupt
+  def interrupt no=7
     return false unless enabled_interrupt?
-    rst 7
+    rst no
     true
   end
 
@@ -453,7 +453,7 @@ class I8080
       mov_r_r
     
     end
-
+    @pc &= 0xffff
   end
 
 
@@ -545,9 +545,7 @@ class I8080
 
   def cpi_i
     @pc += 1
-    l = @mem[@pc]; @pc += 1
-    h = @mem[@pc]; @pc += 1
-    i = @mem[h << 8 | l]
+    i = @mem[@pc]; @pc += 1
     a = read_r(REG_A)
     write_r REG_NONE, a - i, (a & 0xf) - (i & 0xf), FLGS_ALL
     @state += 7

@@ -4,3 +4,6 @@ movies
 board.hex
 examples/training_board/mon_tutorial_1.hex
 examples/training_board/mon_tutorial_2.hex
+rom.hex
+rom.rb
+/examples/game/notes
